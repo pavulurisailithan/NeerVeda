@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - NeerVeda Professional</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/professional.css') }}">
+</head>
+<body class="min-h-screen flex">
+    <!-- Left Side - Branding -->
+    <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-green-600 relative overflow-hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-20"></div>
+        <div class="relative z-10 flex flex-col justify-center px-12 text-white">
+            <div class="mb-8">
+                <div class="flex items-center space-x-3 mb-6">
+                    <div class="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
+                        <i data-feather="droplet" class="text-white w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <span class="font-bold text-2xl">NeerVeda</span>
+                        <div class="text-blue-100 text-sm">Smart Agriculture Platform</div>
+                    </div>
+                </div>
+                <h1 class="text-4xl font-bold mb-4">Welcome Back to the Future of Farming</h1>
+                <p class="text-xl text-blue-100 leading-relaxed">Access your personalized dashboard with real-time insights, AI-powered recommendations, and comprehensive farm management tools.</p>
+            </div>
+            <div class="grid grid-cols-1 gap-6">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
+                        <i data-feather="activity" class="text-white w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold">Real-Time Monitoring</div>
+                        <div class="text-blue-100 text-sm">24/7 field surveillance</div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
+                        <i data-feather="brain" class="text-white w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold">AI-Powered Insights</div>
+                        <div class="text-blue-100 text-sm">Smart recommendations</div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
+                        <i data-feather="trending-up" class="text-white w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold">Yield Optimization</div>
+                        <div class="text-blue-100 text-sm">Maximize productivity</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="absolute bottom-0 right-0 w-64 h-64 bg-white bg-opacity-10 rounded-full transform translate-x-32 translate-y-32"></div>
+        <div class="absolute top-0 left-0 w-32 h-32 bg-white bg-opacity-10 rounded-full transform -translate-x-16 -translate-y-16"></div>
+    </div>
+    
+    <!-- Right Side - Login Form -->
+    <div class="flex-1 flex items-center justify-center px-6 py-12">
+        <div class="max-w-md w-full">
+            <div class="text-center mb-8">
+                <div class="lg:hidden flex justify-center mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-green-500 rounded-2xl flex items-center justify-center">
+                        <i data-feather="droplet" class="text-white w-8 h-8"></i>
+                    </div>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">
+                    Sign in to your account
+                </h2>
+                <p class="text-gray-600">
+                    Access your smart agriculture dashboard
+                </p>
+            </div>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl">
+                        <div class="flex items-center">
+                            <i data-feather="alert-circle" class="w-5 h-5 mr-2"></i>
+                            {{ messages[0] }}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <form class="space-y-6" method="POST">
+                <div class="space-y-4">
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email address</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i data-feather="mail" class="h-5 w-5 text-gray-400"></i>
+                            </div>
+                            <input id="email" name="email" type="email" autocomplete="email" required class="pro-input pl-10 w-full" placeholder="Enter your email">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i data-feather="lock" class="h-5 w-5 text-gray-400"></i>
+                            </div>
+                            <input id="password" name="password" type="password" autocomplete="current-password" required class="pro-input pl-10 w-full" placeholder="Enter your password">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label for="remember-me" class="ml-2 block text-sm text-gray-700">
+                            Remember me
+                        </label>
+                    </div>
+                    <div class="text-sm">
+                        <a href="#" class="font-medium text-blue-600 hover:text-blue-500">
+                            Forgot password?
+                        </a>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full pro-btn text-white py-3 text-lg font-semibold">
+                    <i data-feather="log-in" class="h-5 w-5 inline mr-2"></i>
+                    Sign in to Dashboard
+                </button>
+            </form>
+            
+            <div class="mt-8">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-gray-500">New to NeerVeda?</span>
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <a href="/signup" class="w-full flex justify-center py-3 px-4 border-2 border-gray-300 rounded-xl text-sm font-semibold text-gray-700 hover:border-blue-500 hover:text-blue-600 transition">
+                        Create your account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        feather.replace();
+    </script>
+</body>
+</html>

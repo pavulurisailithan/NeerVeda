@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Seasons - NeerVeda</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/professional.css') }}">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .season-card {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        .season-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        .season-active {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        .season-active:hover {
+            background: linear-gradient(135deg, #43a3f5 0%, #00e8f5 100%);
+        }
+        .glass-card {
+            backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Seasonal Navigation -->
+    <nav class="glass-card sticky top-0 z-50 border-b border-white/20">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                        <i data-feather="calendar" class="text-white w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="font-bold text-xl text-white">NeerVeda</span>
+                        <div class="text-xs text-white/70 font-medium">Seasonal Intelligence</div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-1">
+                    <a href="/" class="px-4 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition font-medium">Home</a>
+                    <a href="/dashboard" class="px-4 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition font-medium">Dashboard</a>
+                    <a href="/alerts" class="px-4 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition font-medium">Alerts</a>
+                    <a href="/fields" class="px-4 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition font-medium">Fields</a>
+                    <a href="/crop-seasons" class="px-4 py-2 rounded-lg bg-white/20 text-white font-semibold backdrop-blur-sm">Seasons</a>
+                    <a href="/irrigation" class="px-4 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition font-medium">Irrigation</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section with Seasonal Theme -->
+    <div class="container mx-auto px-4 py-12">
+        <div class="text-center mb-16">
+            <div class="glass-card rounded-3xl p-12 mb-8">
+                <h1 class="text-5xl font-bold text-white mb-4">🌾 Seasonal Crop Intelligence</h1>
+                <p class="text-xl text-white/80 max-w-2xl mx-auto">Plan your farming calendar with AI-powered seasonal insights and weather-based crop recommendations</p>
+            </div>
+        </div>
+
+        <!-- Current Season Banner -->
+        <div class="glass-card rounded-2xl p-8 mb-12 text-white">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-6">
+                    <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center">
+                        <i data-feather="sun" class="w-10 h-10 text-yellow-300"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold mb-2">Current Season: Rabi</h2>
+                        <p class="text-white/80 text-lg">Winter cultivation period (Oct - Mar)</p>
+                        <div class="flex items-center space-x-4 mt-3">
+                            <span class="bg-white/20 px-3 py-1 rounded-full text-sm">45 days remaining</span>
+                            <span class="bg-green-500/30 px-3 py-1 rounded-full text-sm">Optimal conditions</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-4xl font-bold">18°C</div>
+                    <div class="text-white/70">Average temp</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Village Selector -->
+        <div class="glass-card rounded-2xl p-6 mb-12">
+            <div class="flex items-center justify-between">
+                <h3 class="text-xl font-semibold text-white">Select Your Village</h3>
+                <select id="villageSelect" class="bg-white/20 text-white border border-white/30 rounded-lg px-4 py-2 backdrop-blur-sm">
+                    <option value="">Choose Village</option>
+                    <option value="Vijayawada">Vijayawada</option>
+                    <option value="Machilipatnam">Machilipatnam</option>
+                    <option value="Gudivada">Gudivada</option>
+                    <option value="Jaggayyapeta">Jaggayyapeta</option>
+                    <option value="Nuzvidu">Nuzvidu</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Village Info -->
+        <div id="villageInfo" class="hidden glass-card rounded-2xl p-8 mb-12 text-white">
+            <h3 class="text-2xl font-bold mb-6">Village Analytics: <span id="selectedVillage" class="text-blue-300"></span></h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-blue-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i data-feather="droplet" class="w-8 h-8 text-blue-300"></i>
+                    </div>
+                    <div class="text-3xl font-bold mb-2" id="moistureValue">--</div>
+                    <div class="text-white/70">Soil Moisture</div>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-green-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i data-feather="layers" class="w-8 h-8 text-green-300"></i>
+                    </div>
+                    <div class="text-2xl font-bold mb-2" id="soilType">--</div>
+                    <div class="text-white/70">Soil Type</div>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-purple-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i data-feather="cloud-rain" class="w-8 h-8 text-purple-300"></i>
+                    </div>
+                    <div class="text-2xl font-bold mb-2" id="rainfall">--</div>
+                    <div class="text-white/70">Annual Rainfall</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Season Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            <!-- Kharif Season -->
+            <div class="season-card rounded-2xl overflow-hidden">
+                <div class="bg-gradient-to-br from-green-500 to-emerald-600 p-6 text-white">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-2xl font-bold">Kharif</h3>
+                        <i data-feather="cloud-rain" class="w-8 h-8"></i>
+                    </div>
+                    <p class="text-green-100">Monsoon Season</p>
+                    <div class="text-sm text-green-200 mt-2">June - October</div>
+                </div>
+                <div class="p-6">
+                    <div class="mb-6">
+                        <h4 class="font-semibold text-gray-800 mb-3">Best Crops</h4>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">🌾 Rice</span>
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">🌱 Cotton</span>
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">🌽 Maize</span>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Water Need:</span>
+                            <span class="font-semibold text-blue-600">High</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Soil Moisture:</span>
+                            <span class="font-semibold">80-90%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rabi Season (Active) -->
+            <div class="season-card season-active rounded-2xl overflow-hidden">
+                <div class="bg-gradient-to-br from-blue-600 to-indigo-700 p-6 text-white">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-2xl font-bold">Rabi</h3>
+                        <i data-feather="sun" class="w-8 h-8"></i>
+                    </div>
+                    <p class="text-blue-100">Winter Season (Current)</p>
+                    <div class="text-sm text-blue-200 mt-2">October - March</div>
+                </div>
+                <div class="p-6 text-white">
+                    <div class="mb-6">
+                        <h4 class="font-semibold mb-3">Best Crops</h4>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-white/20 px-3 py-1 rounded-full text-sm">🌾 Wheat</span>
+                            <span class="bg-white/20 px-3 py-1 rounded-full text-sm">🌱 Barley</span>
+                            <span class="bg-white/20 px-3 py-1 rounded-full text-sm">🟡 Mustard</span>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-white/80">Water Need:</span>
+                            <span class="font-semibold text-blue-200">Medium</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-white/80">Soil Moisture:</span>
+                            <span class="font-semibold">60-70%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Zaid Season -->
+            <div class="season-card rounded-2xl overflow-hidden">
+                <div class="bg-gradient-to-br from-orange-500 to-red-600 p-6 text-white">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-2xl font-bold">Zaid</h3>
+                        <i data-feather="thermometer" class="w-8 h-8"></i>
+                    </div>
+                    <p class="text-orange-100">Summer Season</p>
+                    <div class="text-sm text-orange-200 mt-2">March - June</div>
+                </div>
+                <div class="p-6">
+                    <div class="mb-6">
+                        <h4 class="font-semibold text-gray-800 mb-3">Best Crops</h4>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm">🍉 Watermelon</span>
+                            <span class="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm">🥒 Cucumber</span>
+                            <span class="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm">🌿 Fodder</span>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Water Need:</span>
+                            <span class="font-semibold text-orange-600">High</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Soil Moisture:</span>
+                            <span class="font-semibold">70-80%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seasonal Tips -->
+        <div class="glass-card rounded-2xl p-8 text-white">
+            <h2 class="text-3xl font-bold mb-8 text-center">🌟 Seasonal Farming Tips</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white/10 rounded-xl p-6 backdrop-blur-sm">
+                    <div class="w-12 h-12 bg-green-500/30 rounded-xl flex items-center justify-center mb-4">
+                        <i data-feather="cloud-rain" class="w-6 h-6 text-green-300"></i>
+                    </div>
+                    <h3 class="font-bold text-lg mb-3">Kharif Tips</h3>
+                    <ul class="space-y-2 text-white/80 text-sm">
+                        <li>• Ensure proper drainage</li>
+                        <li>• Monitor pest attacks</li>
+                        <li>• Use disease-resistant varieties</li>
+                    </ul>
+                </div>
+                <div class="bg-white/10 rounded-xl p-6 backdrop-blur-sm">
+                    <div class="w-12 h-12 bg-blue-500/30 rounded-xl flex items-center justify-center mb-4">
+                        <i data-feather="sun" class="w-6 h-6 text-blue-300"></i>
+                    </div>
+                    <h3 class="font-bold text-lg mb-3">Rabi Tips</h3>
+                    <ul class="space-y-2 text-white/80 text-sm">
+                        <li>• Regular irrigation needed</li>
+                        <li>• Protect from frost</li>
+                        <li>• Timely fertilizer application</li>
+                    </ul>
+                </div>
+                <div class="bg-white/10 rounded-xl p-6 backdrop-blur-sm">
+                    <div class="w-12 h-12 bg-orange-500/30 rounded-xl flex items-center justify-center mb-4">
+                        <i data-feather="thermometer" class="w-6 h-6 text-orange-300"></i>
+                    </div>
+                    <h3 class="font-bold text-lg mb-3">Zaid Tips</h3>
+                    <ul class="space-y-2 text-white/80 text-sm">
+                        <li>• Adequate water supply</li>
+                        <li>• Use mulching techniques</li>
+                        <li>• Heat-tolerant varieties</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/translations.js') }}"></script>
+    <script>
+        feather.replace();
+
+        const villageSelect = document.getElementById('villageSelect');
+        const villageInfo = document.getElementById('villageInfo');
+        const moistureValue = document.getElementById('moistureValue');
+        const soilType = document.getElementById('soilType');
+        const rainfall = document.getElementById('rainfall');
+        const selectedVillage = document.getElementById('selectedVillage');
+
+        // Seasonal functionality
+        function selectSeason(seasonName) {
+            // Remove active class from all seasons
+            document.querySelectorAll('.season-card').forEach(card => {
+                card.classList.remove('season-active');
+            });
+            
+            // Add active class to selected season
+            const selectedCard = Array.from(document.querySelectorAll('.season-card'))
+                .find(card => card.querySelector('h3').textContent === seasonName);
+            if (selectedCard) {
+                selectedCard.classList.add('season-active');
+            }
+            
+            alert(`Selected ${seasonName} season for detailed planning`);
+        }
+        
+        function planCropRotation() {
+            const currentSeason = prompt('Current season (Kharif/Rabi/Zaid):');
+            const nextCrop = prompt('Next crop to plant:');
+            const area = prompt('Area in hectares:');
+            
+            if (currentSeason && nextCrop && area) {
+                alert(`Crop rotation planned:\nSeason: ${currentSeason}\nCrop: ${nextCrop}\nArea: ${area} hectares`);
+            }
+        }
+        
+        function exportSeasonalData() {
+            const csvContent = "Season,Duration,Crops,Water_Need,Soil_Moisture\n" +
+                "Kharif,June-October,Rice;Cotton;Maize;Sugarcane,High,80-90%\n" +
+                "Rabi,October-March,Wheat;Barley;Mustard;Peas,Medium,60-70%\n" +
+                "Zaid,March-June,Watermelon;Cucumber;Fodder;Vegetables,High,70-80%";
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'seasonal_data.csv';
+            a.click();
+            alert('Seasonal data exported!');
+        }
+        
+        function setReminder(season, task) {
+            const date = prompt(`Set reminder date for ${task} in ${season} season (YYYY-MM-DD):`);
+            if (date) {
+                alert(`Reminder set: ${task} for ${season} season on ${date}`);
+                // Store in localStorage
+                const reminders = JSON.parse(localStorage.getItem('seasonalReminders') || '[]');
+                reminders.push({ season, task, date, created: new Date().toISOString() });
+                localStorage.setItem('seasonalReminders', JSON.stringify(reminders));
+            }
+        }
+        
+        function viewSeasonalCalendar() {
+            alert('Opening seasonal calendar with planting and harvesting schedules...');
+            // Simulate calendar view
+            const calendar = `
+            SEASONAL CALENDAR:
+            
+            KHARIF (June-October):
+            - Rice: Plant June-July, Harvest Oct-Nov
+            - Cotton: Plant May-June, Harvest Oct-Jan
+            
+            RABI (October-March):
+            - Wheat: Plant Nov-Dec, Harvest Mar-Apr
+            - Barley: Plant Oct-Nov, Harvest Mar-Apr
+            
+            ZAID (March-June):
+            - Watermelon: Plant Feb-Mar, Harvest May-Jun
+            - Cucumber: Plant Feb-Mar, Harvest Apr-May
+            `;
+            alert(calendar);
+        }
+        
+        villageSelect.addEventListener('change', function() {
+            const village = this.value;
+            if (village) {
+                fetch(`/api/village-data/${village}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        villageInfo.classList.remove('hidden');
+                        moistureValue.textContent = data.moisture + '%';
+                        soilType.textContent = data.soilType;
+                        rainfall.textContent = data.rainfall;
+                        selectedVillage.textContent = village;
+                        
+                        // Update recommendations based on village data
+                        updateVillageRecommendations(village, data);
+                    })
+                    .catch(error => console.error('Error:', error));
+            } else {
+                villageInfo.classList.add('hidden');
+            }
+        });
+        
+        function updateVillageRecommendations(village, data) {
+            const recommendations = {
+                'Vijayawada': 'Ideal for rice cultivation with high moisture levels',
+                'Machilipatnam': 'Perfect for coconut and aquaculture',
+                'Gudivada': 'Suitable for cotton and spice cultivation',
+                'Jaggayyapeta': 'Good for groundnut and cotton farming',
+                'Nuzvidu': 'Excellent for cotton and sunflower crops'
+            };
+            
+            if (recommendations[village]) {
+                alert(`Village Recommendation: ${recommendations[village]}`);
+            }
+        }
+        
+        // Make season cards clickable
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.season-card').forEach(card => {
+                const seasonName = card.querySelector('h3').textContent;
+                card.style.cursor = 'pointer';
+                card.onclick = () => selectSeason(seasonName);
+            });
+            
+            // Add functionality to buttons
+            setTimeout(() => {
+                const buttons = document.querySelectorAll('button');
+                buttons.forEach(button => {
+                    if (button.textContent.includes('Plan Rotation')) {
+                        button.onclick = planCropRotation;
+                    } else if (button.textContent.includes('Export')) {
+                        button.onclick = exportSeasonalData;
+                    } else if (button.textContent.includes('Calendar')) {
+                        button.onclick = viewSeasonalCalendar;
+                    }
+                });
+            }, 500);
+        });
+    </script>
+</body>
+</html>

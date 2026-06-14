@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+
+{% block title %}Crop Recommendations - NeerVeda{% endblock %}
+
+{% block content %}
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-8" data-translate="Crop Recommendations">Crop Recommendations</h1>
+        
+        <!-- Input Section -->
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4" data-translate="Enter Soil Conditions">Enter Soil Conditions</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="Soil Moisture (%)">Soil Moisture (%)</label>
+                    <input type="number" id="moisture" min="0" max="100" class="w-full px-3 py-2 border rounded-md" placeholder="Enter moisture %">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="Temperature (°C)">Temperature (°C)</label>
+                    <input type="number" id="temperature" min="0" max="50" class="w-full px-3 py-2 border rounded-md" placeholder="Enter temperature">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="Season">Season</label>
+                    <select id="season" class="w-full px-3 py-2 border rounded-md">
+                        <option value="">Select Season</option>
+                        <option value="summer" data-translate="Summer">Summer</option>
+                        <option value="monsoon" data-translate="Monsoon">Monsoon</option>
+                        <option value="winter" data-translate="Winter">Winter</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="getCropRecommendations()" class="mt-4 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700" data-translate="Get Recommendations">Get Recommendations</button>
+        </div>
+
+        <!-- Recommendations Section -->
+        <div id="recommendations" class="hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6" data-translate="Recommended Crops">Recommended Crops</h2>
+            <div id="cropCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+    <script>
+        feather.replace();
+
+        const cropDatabase = {
+            rice: { name: 'Rice', moistureMin: 60, moistureMax: 90, tempMin: 20, tempMax: 35, seasons: ['monsoon'], yield: 'High', water: 'High' },
+            wheat: { name: 'Wheat', moistureMin: 40, moistureMax: 70, tempMin: 15, tempMax: 25, seasons: ['winter'], yield: 'Medium', water: 'Medium' },
+            corn: { name: 'Corn', moistureMin: 50, moistureMax: 80, tempMin: 18, tempMax: 30, seasons: ['summer', 'monsoon'], yield: 'High', water: 'Medium' },
+            cotton: { name: 'Cotton', moistureMin: 30, moistureMax: 60, tempMin: 20, tempMax: 35, seasons: ['summer'], yield: 'Medium', water: 'Low' },
+            sugarcane: { name: 'Sugarcane', moistureMin: 70, moistureMax: 95, tempMin: 25, tempMax: 40, seasons: ['summer', 'monsoon'], yield: 'Very High', water: 'Very High' },
+            soybean: { name: 'Soybean', moistureMin: 45, moistureMax: 75, tempMin: 20, tempMax: 30, seasons: ['monsoon'], yield: 'Medium', water: 'Medium' },
+            millet: { name: 'Millet', moistureMin: 20, moistureMax: 50, tempMin: 25, tempMax: 40, seasons: ['summer'], yield: 'Low', water: 'Very Low' },
+            barley: { name: 'Barley', moistureMin: 35, moistureMax: 65, tempMin: 10, tempMax: 20, seasons: ['winter'], yield: 'Medium', water: 'Low' }
+        };
+
+        function getCropRecommendations() {
+            const moisture = parseInt(document.getElementById('moisture').value);
+            const temperature = parseInt(document.getElementById('temperature').value);
+            const season = document.getElementById('season').value;
+
+            if (!moisture || !temperature || !season) {
+                alert('Please fill all fields');
+                return;
+            }
+            
+            if (moisture < 0 || moisture > 100) {
+                alert('Moisture must be between 0-100%');
+                return;
+            }
+            
+            if (temperature < 0 || temperature > 50) {
+                alert('Temperature must be between 0-50°C');
+                return;
+            }
+
+            const recommendations = [];
+            
+            for (const [key, crop] of Object.entries(cropDatabase)) {
+                if (moisture >= crop.moistureMin && moisture <= crop.moistureMax &&
+                    temperature >= crop.tempMin && temperature <= crop.tempMax &&
+                    crop.seasons.includes(season)) {
+                    recommendations.push({ ...crop, suitability: calculateSuitability(moisture, temperature, crop) });
+                }
+            }
+
+            recommendations.sort((a, b) => b.suitability - a.suitability);
+            displayRecommendations(recommendations);
+        }
+
+        function calculateSuitability(moisture, temp, crop) {
+            const moistureScore = 100 - Math.abs(moisture - (crop.moistureMin + crop.moistureMax) / 2);
+            const tempScore = 100 - Math.abs(temp - (crop.tempMin + crop.tempMax) / 2);
+            return (moistureScore + tempScore) / 2;
+        }
+
+        function displayRecommendations(recommendations) {
+            const container = document.getElementById('cropCards');
+            const section = document.getElementById('recommendations');
+            
+            if (recommendations.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 col-span-full text-center">No suitable crops found for these conditions.</p>';
+            } else {
+                container.innerHTML = recommendations.map(crop => `
+                    <div class="bg-white rounded-lg shadow p-6 border-l-4 ${getSuitabilityColor(crop.suitability)}">
+                        <h3 class="text-xl font-bold mb-2">${crop.name}</h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span>Suitability:</span>
+                                <span class="font-medium">${Math.round(crop.suitability)}%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Expected Yield:</span>
+                                <span class="font-medium">${crop.yield}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Water Requirement:</span>
+                                <span class="font-medium">${crop.water}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Moisture Range:</span>
+                                <span class="font-medium">${crop.moistureMin}-${crop.moistureMax}%</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            section.classList.remove('hidden');
+        }
+
+        function getSuitabilityColor(score) {
+            if (score >= 80) return 'border-green-500';
+            if (score >= 60) return 'border-yellow-500';
+            return 'border-red-500';
+        }
+        
+        // Additional functionality
+        function saveCropPlan(cropName) {
+            const plans = JSON.parse(localStorage.getItem('cropPlans') || '[]');
+            const newPlan = {
+                crop: cropName,
+                date: new Date().toISOString(),
+                conditions: {
+                    moisture: document.getElementById('moisture').value,
+                    temperature: document.getElementById('temperature').value,
+                    season: document.getElementById('season').value
+                }
+            };
+            plans.push(newPlan);
+            localStorage.setItem('cropPlans', JSON.stringify(plans));
+            alert(`${cropName} added to your crop plan!`);
+        }
+        
+        function exportRecommendations() {
+            const recommendations = document.querySelectorAll('#cropCards > div');
+            let csvContent = "Crop,Suitability,Yield,Water_Requirement,Moisture_Range\n";
+            
+            recommendations.forEach(card => {
+                const crop = card.querySelector('h3').textContent;
+                const suitability = card.querySelector('.font-medium').textContent;
+                const yield = card.querySelectorAll('.font-medium')[1].textContent;
+                const water = card.querySelectorAll('.font-medium')[2].textContent;
+                const moisture = card.querySelectorAll('.font-medium')[3].textContent;
+                csvContent += `${crop},${suitability},${yield},${water},${moisture}\n`;
+            });
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'crop_recommendations.csv';
+            a.click();
+            alert('Recommendations exported to CSV!');
+        }
+        
+        function clearForm() {
+            document.getElementById('moisture').value = '';
+            document.getElementById('temperature').value = '';
+            document.getElementById('season').value = '';
+            document.getElementById('recommendations').classList.add('hidden');
+        }
+        
+        function loadSavedConditions() {
+            const saved = localStorage.getItem('lastConditions');
+            if (saved) {
+                const conditions = JSON.parse(saved);
+                document.getElementById('moisture').value = conditions.moisture;
+                document.getElementById('temperature').value = conditions.temperature;
+                document.getElementById('season').value = conditions.season;
+                alert('Last used conditions loaded!');
+            } else {
+                alert('No saved conditions found.');
+            }
+        }
+        
+        function saveCurrentConditions() {
+            const conditions = {
+                moisture: document.getElementById('moisture').value,
+                temperature: document.getElementById('temperature').value,
+                season: document.getElementById('season').value
+            };
+            localStorage.setItem('lastConditions', JSON.stringify(conditions));
+            alert('Current conditions saved!');
+        }
+        
+        // Enhanced getCropRecommendations with save functionality
+        const originalGetCropRecommendations = getCropRecommendations;
+        getCropRecommendations = function() {
+            originalGetCropRecommendations();
+            saveCurrentConditions();
+        };
+        
+        // Add buttons and functionality after DOM loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add additional buttons to the form
+            const buttonContainer = document.querySelector('button[onclick="getCropRecommendations()"]').parentNode;
+            
+            const clearBtn = document.createElement('button');
+            clearBtn.type = 'button';
+            clearBtn.className = 'bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700';
+            clearBtn.textContent = 'Clear Form';
+            clearBtn.onclick = clearForm;
+            buttonContainer.appendChild(clearBtn);
+            
+            const loadBtn = document.createElement('button');
+            loadBtn.type = 'button';
+            loadBtn.className = 'bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700';
+            loadBtn.textContent = 'Load Saved';
+            loadBtn.onclick = loadSavedConditions;
+            buttonContainer.appendChild(loadBtn);
+            
+            // Add export button to recommendations section
+            setTimeout(() => {
+                const recsSection = document.getElementById('recommendations');
+                if (recsSection && !recsSection.classList.contains('hidden')) {
+                    const exportBtn = document.createElement('button');
+                    exportBtn.className = 'mt-4 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700';
+                    exportBtn.textContent = 'Export Recommendations';
+                    exportBtn.onclick = exportRecommendations;
+                    recsSection.appendChild(exportBtn);
+                }
+            }, 1000);
+        });
+        
+        // Override displayRecommendations to add save buttons
+        const originalDisplayRecommendations = displayRecommendations;
+        displayRecommendations = function(recommendations) {
+            const container = document.getElementById('cropCards');
+            const section = document.getElementById('recommendations');
+            
+            if (recommendations.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 col-span-full text-center">No suitable crops found for these conditions.</p>';
+            } else {
+                container.innerHTML = recommendations.map(crop => `
+                    <div class="bg-white rounded-lg shadow p-6 border-l-4 ${getSuitabilityColor(crop.suitability)}">
+                        <h3 class="text-xl font-bold mb-2">${crop.name}</h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span>Suitability:</span>
+                                <span class="font-medium">${Math.round(crop.suitability)}%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Expected Yield:</span>
+                                <span class="font-medium">${crop.yield}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Water Requirement:</span>
+                                <span class="font-medium">${crop.water}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Moisture Range:</span>
+                                <span class="font-medium">${crop.moistureMin}-${crop.moistureMax}%</span>
+                            </div>
+                        </div>
+                        <button onclick="saveCropPlan('${crop.name}')" class="mt-4 w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 text-sm">
+                            Add to Plan
+                        </button>
+                    </div>
+                `).join('');
+            }
+            
+            section.classList.remove('hidden');
+            
+            // Add export button if not already present
+            if (!section.querySelector('button[onclick="exportRecommendations()"]')) {
+                const exportBtn = document.createElement('button');
+                exportBtn.className = 'mt-6 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700';
+                exportBtn.textContent = 'Export All Recommendations';
+                exportBtn.onclick = exportRecommendations;
+                section.appendChild(exportBtn);
+            }
+        };
+    </script>
+{% endblock %}

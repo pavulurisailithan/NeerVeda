@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}NeerVeda - Smart Agriculture Platform{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/professional.css') }}">
+    {% block extra_head %}{% endblock %}
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Professional Navigation -->
+    <nav class="pro-nav sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-green-500 rounded-xl flex items-center justify-center">
+                        <i data-feather="droplet" class="text-white w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="font-bold text-xl text-gray-800">NeerVeda</span>
+                        <div class="text-xs text-gray-500 font-medium">Smart Agriculture Platform</div>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="/" class="px-4 py-2 rounded-lg {% if request.endpoint == 'index' %}bg-blue-100 text-blue-700 font-semibold{% else %}text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition font-medium{% endif %}">Home</a>
+                    <a href="/dashboard" class="px-4 py-2 rounded-lg {% if request.endpoint == 'dashboard' %}bg-blue-100 text-blue-700 font-semibold{% else %}text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition font-medium{% endif %}">Dashboard</a>
+                    <a href="/alerts" class="px-4 py-2 rounded-lg {% if request.endpoint == 'alerts' %}bg-blue-100 text-blue-700 font-semibold{% else %}text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition font-medium{% endif %}">Alerts</a>
+                    <a href="/fields" class="px-4 py-2 rounded-lg {% if request.endpoint == 'fields' %}bg-blue-100 text-blue-700 font-semibold{% else %}text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition font-medium{% endif %}">Fields</a>
+                    <a href="/crop-seasons" class="px-4 py-2 rounded-lg {% if request.endpoint == 'crop_seasons' %}bg-blue-100 text-blue-700 font-semibold{% else %}text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition font-medium{% endif %}">Seasons</a>
+                    <a href="/irrigation" class="px-4 py-2 rounded-lg {% if request.endpoint == 'irrigation' %}bg-blue-100 text-blue-700 font-semibold{% else %}text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition font-medium{% endif %}">Irrigation</a>
+                    <a href="/profile" class="px-4 py-2 rounded-lg {% if request.endpoint == 'profile' %}bg-blue-100 text-blue-700 font-semibold{% else %}text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition font-medium{% endif %}">Profile</a>
+                    <a href="/login" class="pro-btn text-white ml-4">Get Started</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <button id="langBtn" class="flex items-center space-x-1 bg-green-700 px-3 py-1 rounded-lg text-white">
+                            <span id="langText">EN</span>
+                            <i data-feather="chevron-down" class="w-4 h-4"></i>
+                        </button>
+                        <div id="langDropdown" class="hidden absolute right-0 mt-2 bg-white rounded-lg shadow-lg border z-10">
+                            <button onclick="switchLanguage('en')" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left">English</button>
+                            <button onclick="switchLanguage('te')" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left">తెలుగు</button>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <button id="profileBtn" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition border border-gray-200 bg-white shadow-sm">
+                            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center shadow-md">
+                                <i data-feather="user" class="w-5 h-5 text-white"></i>
+                            </div>
+                            <div class="hidden md:block">
+                                <div class="text-sm font-medium text-gray-700">Profile</div>
+                            </div>
+                            <i data-feather="chevron-down" class="w-4 h-4 text-gray-600"></i>
+                        </button>
+                        <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border z-20">
+                            <div class="px-4 py-3 border-b border-gray-100">
+                                <p class="text-sm font-medium text-gray-800">{% if session.user %}{{ session.user.split('@')[0].title() }}{% else %}Demo User{% endif %}</p>
+                                <p class="text-xs text-gray-500">{% if session.user %}{{ session.user }}{% else %}demo@example.com{% endif %}</p>
+                            </div>
+                            <a href="/profile" class="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-100 transition">
+                                <i data-feather="user" class="w-4 h-4"></i>
+                                <span>My Profile</span>
+                            </a>
+                            <a href="/dashboard" class="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-100 transition">
+                                <i data-feather="grid" class="w-4 h-4"></i>
+                                <span>Dashboard</span>
+                            </a>
+                            <a href="/fields" class="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-100 transition">
+                                <i data-feather="map" class="w-4 h-4"></i>
+                                <span>My Fields</span>
+                            </a>
+                            <div class="border-t border-gray-100">
+                                <a href="/logout" class="flex items-center space-x-2 px-4 py-2 text-red-600 hover:bg-red-50 transition">
+                                    <i data-feather="log-out" class="w-4 h-4"></i>
+                                    <span>Sign Out</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="mobileMenuBtn" class="md:hidden">
+                        <i data-feather="menu" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="mobileMenu" class="hidden md:hidden mt-4 space-y-2">
+                <a href="/" class="block py-2 hover:text-green-200">Home</a>
+                <a href="/dashboard" class="block py-2 hover:text-green-200">Dashboard</a>
+                <a href="/alerts" class="block py-2 hover:text-green-200">Alerts</a>
+                <a href="/fields" class="block py-2 hover:text-green-200">Fields</a>
+                <a href="/crop-seasons" class="block py-2 hover:text-green-200">Seasons</a>
+                <a href="/irrigation" class="block py-2 hover:text-green-200">Irrigation</a>
+                <a href="/profile" class="block py-2 hover:text-green-200">Profile</a>
+                <a href="/login" class="block py-2 hover:text-green-200">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    {% block content %}{% endblock %}
+
+    <!-- Professional Footer -->
+    <footer class="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white py-16 mt-20">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-green-500 rounded-xl flex items-center justify-center">
+                            <i data-feather="droplet" class="text-white w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <span class="font-bold text-2xl">NeerVeda</span>
+                            <div class="text-sm text-gray-400">Smart Agriculture Platform</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 text-lg mb-6 max-w-md">Revolutionizing agriculture with AI-powered insights, real-time monitoring, and sustainable farming solutions.</p>
+                    <div class="flex space-x-4">
+                        <div class="w-10 h-10 bg-gray-700 rounded-lg flex items-center justify-center hover:bg-blue-600 transition cursor-pointer">
+                            <i data-feather="twitter" class="w-5 h-5"></i>
+                        </div>
+                        <div class="w-10 h-10 bg-gray-700 rounded-lg flex items-center justify-center hover:bg-blue-600 transition cursor-pointer">
+                            <i data-feather="linkedin" class="w-5 h-5"></i>
+                        </div>
+                        <div class="w-10 h-10 bg-gray-700 rounded-lg flex items-center justify-center hover:bg-green-600 transition cursor-pointer">
+                            <i data-feather="github" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-6">Platform</h4>
+                    <ul class="space-y-3 text-gray-300">
+                        <li><a href="/dashboard" class="hover:text-white transition">Dashboard</a></li>
+                        <li><a href="/fields" class="hover:text-white transition">Field Management</a></li>
+                        <li><a href="/irrigation" class="hover:text-white transition">Smart Irrigation</a></li>
+                        <li><a href="/crop-seasons" class="hover:text-white transition">Crop Intelligence</a></li>
+                        <li><a href="/alerts" class="hover:text-white transition">Alert System</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-6">Support</h4>
+                    <ul class="space-y-3 text-gray-300">
+                        <li><a href="#" class="hover:text-white transition">Documentation</a></li>
+                        <li><a href="#" class="hover:text-white transition">API Reference</a></li>
+                        <li><a href="#" class="hover:text-white transition">Community</a></li>
+                        <li><a href="#" class="hover:text-white transition">Contact Support</a></li>
+                        <li><a href="#" class="hover:text-white transition">System Status</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="text-gray-400 mb-4 md:mb-0">
+                        © 2024 NeerVeda. All rights reserved. Built with ♥ for sustainable agriculture.
+                    </div>
+                    <div class="flex space-x-6 text-sm text-gray-400">
+                        <a href="#" class="hover:text-white transition">Privacy Policy</a>
+                        <a href="#" class="hover:text-white transition">Terms of Service</a>
+                        <a href="#" class="hover:text-white transition">Cookie Policy</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/translations.js') }}"></script>
+    <script>
+        // Initialize feather icons
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof feather !== 'undefined') {
+                feather.replace();
+            }
+        });
+        
+        // Mobile menu toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            if (mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+            
+            // Language dropdown toggle
+            const langBtn = document.getElementById('langBtn');
+            const langDropdown = document.getElementById('langDropdown');
+            const profileDropdown = document.getElementById('profileDropdown');
+            
+            if (langBtn && langDropdown) {
+                langBtn.addEventListener('click', () => {
+                    langDropdown.classList.toggle('hidden');
+                    if (profileDropdown) profileDropdown.classList.add('hidden');
+                });
+            }
+            
+            // Profile dropdown toggle
+            const profileBtn = document.getElementById('profileBtn');
+            
+            if (profileBtn && profileDropdown) {
+                profileBtn.addEventListener('click', () => {
+                    profileDropdown.classList.toggle('hidden');
+                    if (langDropdown) langDropdown.classList.add('hidden');
+                });
+            }
+            
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', (e) => {
+                if (langBtn && langDropdown && !e.target.closest('#langBtn') && !e.target.closest('#langDropdown')) {
+                    langDropdown.classList.add('hidden');
+                }
+                if (profileBtn && profileDropdown && !e.target.closest('#profileBtn') && !e.target.closest('#profileDropdown')) {
+                    profileDropdown.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

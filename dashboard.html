@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - NeerVeda</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/professional.css') }}">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+        }
+        .dashboard-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .dashboard-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .metric-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(15px);
+        }
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+        .chart-container {
+            background: rgba(0,0,0,0.2);
+            border-radius: 16px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-white">
+    <!-- Dashboard Navigation -->
+    <nav class="dashboard-card sticky top-0 z-50 border-b border-white/10">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                        <i data-feather="activity" class="text-white w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="font-bold text-xl text-white">NeerVeda</span>
+                        <div class="text-xs text-white/60 font-medium">Analytics Dashboard</div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-1">
+                    <a href="/" class="px-4 py-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition">Home</a>
+                    <a href="/dashboard" class="px-4 py-2 rounded-lg bg-white/20 text-white font-semibold">Dashboard</a>
+                    <a href="/alerts" class="px-4 py-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition">Alerts</a>
+                    <a href="/fields" class="px-4 py-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition">Fields</a>
+                    <a href="/crop-seasons" class="px-4 py-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition">Seasons</a>
+                    <a href="/irrigation" class="px-4 py-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition">Irrigation</a>
+                    <div class="relative ml-4">
+                        <button id="langBtn" class="flex items-center space-x-1 bg-white/20 text-white px-3 py-1 rounded-lg hover:bg-white/30 transition">
+                            <span id="langText">EN</span>
+                            <i data-feather="chevron-down" class="w-4 h-4"></i>
+                        </button>
+                        <div id="langDropdown" class="hidden absolute right-0 mt-2 bg-white rounded-lg shadow-lg border z-10">
+                            <button onclick="switchLanguage('en')" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left">English</button>
+                            <button onclick="switchLanguage('te')" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left">తెలుగు</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Header -->
+    <div class="container mx-auto px-6 py-8">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-4xl font-bold mb-2" data-translate="Analytics Dashboard">📊 Analytics Dashboard</h1>
+                <p class="text-white/70 text-lg" data-translate="Real-time insights and data visualization">Real-time insights and data visualization</p>
+            </div>
+            <div class="flex space-x-3">
+                <button class="dashboard-card px-4 py-2 rounded-lg hover:bg-white/10 transition">
+                    <i data-feather="calendar" class="w-4 h-4 inline mr-2"></i>Last 7 Days
+                </button>
+                <a href="/add-field" class="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-2 rounded-lg hover:from-blue-600 hover:to-purple-700 transition">
+                    <i data-feather="plus" class="w-4 h-4 inline mr-2"></i>Add Field
+                </a>
+            </div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="metric-card rounded-2xl p-6 glow-effect">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
+                        <i data-feather="droplet" class="text-blue-400 w-6 h-6"></i>
+                    </div>
+                    <span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded-full">+3%</span>
+                </div>
+                <div class="text-white/60 text-sm mb-1" data-translate="Average Moisture">Average Moisture</div>
+                <div class="text-3xl font-bold mb-2">62%</div>
+                <div class="text-xs text-green-400 flex items-center">
+                    <i data-feather="trending-up" class="w-3 h-3 mr-1"></i>Optimal range
+                </div>
+            </div>
+            
+            <div class="metric-card rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
+                        <i data-feather="thermometer" class="text-purple-400 w-6 h-6"></i>
+                    </div>
+                    <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded-full">24h</span>
+                </div>
+                <div class="text-white/60 text-sm mb-1" data-translate="Temperature">Temperature</div>
+                <div class="text-3xl font-bold mb-2">28°C</div>
+                <div class="text-xs text-blue-400 flex items-center">
+                    <i data-feather="clock" class="w-3 h-3 mr-1"></i>Current reading
+                </div>
+            </div>
+            
+            <div class="metric-card rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center">
+                        <i data-feather="alert-triangle" class="text-yellow-400 w-6 h-6"></i>
+                    </div>
+                    <span class="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded-full">Active</span>
+                </div>
+                <div class="text-white/60 text-sm mb-1" data-translate="Active Alerts">Active Alerts</div>
+                <div class="text-3xl font-bold mb-2">2</div>
+                <div class="text-xs text-yellow-400 flex items-center">
+                    <i data-feather="eye" class="w-3 h-3 mr-1"></i>Needs attention
+                </div>
+            </div>
+            
+            <div class="metric-card rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
+                        <i data-feather="map-pin" class="text-green-400 w-6 h-6"></i>
+                    </div>
+                    <span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded-full">Live</span>
+                </div>
+                <div class="text-white/60 text-sm mb-1" data-translate="Fields Monitored">Fields Monitored</div>
+                <div class="text-3xl font-bold mb-2">5</div>
+                <div class="text-xs text-green-400 flex items-center">
+                    <i data-feather="activity" class="w-3 h-3 mr-1"></i>All systems active
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <div class="dashboard-card rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-xl font-bold">Soil Moisture Analytics</h3>
+                        <p class="text-white/60 text-sm">7-day trend analysis</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="w-3 h-3 bg-green-500 rounded-full"></span>
+                        <span class="text-sm text-white/70">Live Data</span>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="moistureChart" height="200"></canvas>
+                </div>
+            </div>
+            
+            <div class="dashboard-card rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-xl font-bold">Climate Conditions</h3>
+                        <p class="text-white/60 text-sm">Temperature & precipitation</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="w-3 h-3 bg-blue-500 rounded-full"></span>
+                        <span class="text-sm text-white/70">Updated</span>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="weatherChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Field Status Table -->
+        <div class="dashboard-card rounded-2xl overflow-hidden mb-8">
+            <div class="p-6 border-b border-white/10">
+                <h3 class="text-xl font-bold">Field Status Overview</h3>
+                <p class="text-white/60 text-sm">Real-time monitoring data</p>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-white/5">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-sm font-medium text-white/70">Field Name</th>
+                            <th class="px-6 py-4 text-left text-sm font-medium text-white/70">Moisture</th>
+                            <th class="px-6 py-4 text-left text-sm font-medium text-white/70">Status</th>
+                            <th class="px-6 py-4 text-left text-sm font-medium text-white/70">Last Update</th>
+                            <th class="px-6 py-4 text-left text-sm font-medium text-white/70">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/10">
+                        <tr class="hover:bg-white/5 transition">
+                            <td class="px-6 py-4 font-medium">North Field</td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-20 h-2 bg-white/20 rounded-full">
+                                        <div class="h-2 bg-yellow-500 rounded-full" style="width: 58%"></div>
+                                    </div>
+                                    <span class="text-sm">58%</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded-full text-xs">Monitor</span>
+                            </td>
+                            <td class="px-6 py-4 text-white/60 text-sm">2 min ago</td>
+                            <td class="px-6 py-4">
+                                <button class="text-blue-400 hover:text-blue-300 text-sm">View Details</button>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition">
+                            <td class="px-6 py-4 font-medium">South Field</td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-20 h-2 bg-white/20 rounded-full">
+                                        <div class="h-2 bg-green-500 rounded-full" style="width: 72%"></div>
+                                    </div>
+                                    <span class="text-sm">72%</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="bg-green-500/20 text-green-400 px-2 py-1 rounded-full text-xs">Optimal</span>
+                            </td>
+                            <td class="px-6 py-4 text-white/60 text-sm">1 min ago</td>
+                            <td class="px-6 py-4">
+                                <button class="text-blue-400 hover:text-blue-300 text-sm">View Details</button>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition">
+                            <td class="px-6 py-4 font-medium">East Field</td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-20 h-2 bg-white/20 rounded-full">
+                                        <div class="h-2 bg-red-500 rounded-full" style="width: 45%"></div>
+                                    </div>
+                                    <span class="text-sm">45%</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="bg-red-500/20 text-red-400 px-2 py-1 rounded-full text-xs">Critical</span>
+                            </td>
+                            <td class="px-6 py-4 text-white/60 text-sm">5 min ago</td>
+                            <td class="px-6 py-4">
+                                <button class="text-blue-400 hover:text-blue-300 text-sm">View Details</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="dashboard-card rounded-2xl p-8">
+            <h3 class="text-2xl font-bold mb-6">⚡ Quick Actions</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <button onclick="window.location.href='/add-field'" class="group flex flex-col items-center p-6 bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-2xl hover:from-blue-500/30 hover:to-blue-600/30 transition-all duration-300">
+                    <div class="w-16 h-16 bg-blue-500/30 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-blue-500/40 transition-colors">
+                        <i data-feather="plus-circle" class="w-8 h-8 text-blue-400"></i>
+                    </div>
+                    <span class="text-sm font-semibold">Add Field</span>
+                </button>
+                
+                <button onclick="window.location.href='/irrigation'" class="group flex flex-col items-center p-6 bg-gradient-to-br from-green-500/20 to-green-600/20 rounded-2xl hover:from-green-500/30 hover:to-green-600/30 transition-all duration-300">
+                    <div class="w-16 h-16 bg-green-500/30 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-green-500/40 transition-colors">
+                        <i data-feather="droplet" class="w-8 h-8 text-green-400"></i>
+                    </div>
+                    <span class="text-sm font-semibold">Irrigation</span>
+                </button>
+                
+                <button onclick="window.location.href='/alerts'" class="group flex flex-col items-center p-6 bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 rounded-2xl hover:from-yellow-500/30 hover:to-yellow-600/30 transition-all duration-300">
+                    <div class="w-16 h-16 bg-yellow-500/30 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-yellow-500/40 transition-colors">
+                        <i data-feather="bell" class="w-8 h-8 text-yellow-400"></i>
+                    </div>
+                    <span class="text-sm font-semibold">Alerts</span>
+                </button>
+                
+                <button onclick="window.location.href='/crop-seasons'" class="group flex flex-col items-center p-6 bg-gradient-to-br from-purple-500/20 to-purple-600/20 rounded-2xl hover:from-purple-500/30 hover:to-purple-600/30 transition-all duration-300">
+                    <div class="w-16 h-16 bg-purple-500/30 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-purple-500/40 transition-colors">
+                        <i data-feather="calendar" class="w-8 h-8 text-purple-400"></i>
+                    </div>
+                    <span class="text-sm font-semibold">Seasons</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/translations.js') }}"></script>
+    <script>
+        feather.replace();
+
+        // Initialize charts
+        function initCharts() {
+            const moistureCtx = document.getElementById('moistureChart').getContext('2d');
+            new Chart(moistureCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Soil Moisture %',
+                        data: [45, 52, 58, 49, 62, 60, 58],
+                        borderColor: '#10B981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: false, 
+                            min: 30, 
+                            max: 80,
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: 'rgba(255,255,255,0.7)' }
+                        },
+                        x: {
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: 'rgba(255,255,255,0.7)' }
+                        }
+                    }
+                }
+            });
+
+            const weatherCtx = document.getElementById('weatherChart').getContext('2d');
+            new Chart(weatherCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Temperature °C',
+                        data: [28, 30, 32, 29, 31, 33, 30],
+                        borderColor: '#EF4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.3)',
+                        type: 'line',
+                        yAxisID: 'y',
+                        tension: 0.4
+                    }, {
+                        label: 'Rainfall mm',
+                        data: [0, 2, 5, 0, 0, 0, 12],
+                        backgroundColor: '#3B82F6',
+                        yAxisID: 'y1',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: 'rgba(255,255,255,0.7)' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: { drawOnChartArea: false },
+                            ticks: { color: 'rgba(255,255,255,0.7)' }
+                        },
+                        x: {
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: 'rgba(255,255,255,0.7)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Dashboard functionality
+        function refreshData() {
+            alert('Refreshing dashboard data...');
+            // Simulate data refresh
+            const moistureValues = document.querySelectorAll('.text-3xl.font-bold');
+            moistureValues.forEach(value => {
+                if (value.textContent.includes('%')) {
+                    const current = parseInt(value.textContent);
+                    const newValue = Math.max(20, Math.min(80, current + Math.floor(Math.random() * 10) - 5));
+                    value.textContent = newValue + '%';
+                    
+                    // Update progress bars
+                    const progressBar = value.closest('tr')?.querySelector('.h-2 > div');
+                    if (progressBar) {
+                        progressBar.style.width = newValue + '%';
+                        progressBar.className = `h-2 rounded-full ${
+                            newValue < 30 ? 'bg-red-500' : 
+                            newValue < 50 ? 'bg-yellow-500' : 'bg-green-500'
+                        }`;
+                    }
+                }
+            });
+        }
+        
+        function viewFieldDetails(fieldName) {
+            alert(`Viewing details for ${fieldName}`);
+            window.location.href = `/fields?field=${encodeURIComponent(fieldName)}`;
+        }
+        
+        function exportData() {
+            alert('Exporting dashboard data to CSV...');
+            // Simulate CSV export
+            const csvContent = "Field,Moisture,Status,Last Update\n" +
+                "North Field,58%,Monitor,2 min ago\n" +
+                "South Field,72%,Optimal,1 min ago\n" +
+                "East Field,45%,Critical,5 min ago";
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'dashboard_data.csv';
+            a.click();
+        }
+        
+        function toggleAutoRefresh() {
+            const isEnabled = localStorage.getItem('autoRefresh') === 'true';
+            localStorage.setItem('autoRefresh', !isEnabled);
+            alert(`Auto-refresh ${!isEnabled ? 'enabled' : 'disabled'}`);
+            
+            if (!isEnabled) {
+                setInterval(refreshData, 30000);
+            }
+        }
+        
+        function openDatePicker() {
+            const dateRange = prompt('Enter date range (e.g., "Last 7 Days", "Last 30 Days", "Custom"):');
+            if (dateRange) {
+                alert(`Date range set to: ${dateRange}`);
+                document.querySelector('button:contains("Last 7 Days")').textContent = dateRange;
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            
+            // Make buttons functional
+            document.querySelectorAll('button').forEach(button => {
+                if (button.textContent.includes('Last 7 Days')) {
+                    button.onclick = openDatePicker;
+                } else if (button.textContent.includes('Add Field')) {
+                    button.onclick = () => window.location.href = '/add-field';
+                } else if (button.textContent.includes('View Details')) {
+                    const row = button.closest('tr');
+                    const fieldName = row?.querySelector('td')?.textContent;
+                    button.onclick = () => viewFieldDetails(fieldName);
+                }
+            });
+            
+            // Quick action buttons
+            document.querySelectorAll('.group').forEach(card => {
+                const text = card.querySelector('span')?.textContent;
+                if (text === 'Add Field') {
+                    card.onclick = () => window.location.href = '/add-field';
+                } else if (text === 'Irrigation') {
+                    card.onclick = () => window.location.href = '/irrigation';
+                } else if (text === 'Alerts') {
+                    card.onclick = () => window.location.href = '/alerts';
+                } else if (text === 'Seasons') {
+                    card.onclick = () => window.location.href = '/crop-seasons';
+                }
+            });
+            
+            // Auto-refresh if enabled
+            if (localStorage.getItem('autoRefresh') === 'true') {
+                setInterval(refreshData, 30000);
+            }
+        });
+    </script>
+</body>
+</html>

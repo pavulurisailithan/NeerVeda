@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Data - NeerVeda</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold" data-translate="Add Data to Database">Add Data to Database</h1>
+            <div class="relative">
+                <button id="langBtn" class="flex items-center space-x-1 bg-green-600 text-white px-3 py-1 rounded">
+                    <span id="langText">EN</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                <div id="langDropdown" class="hidden absolute right-0 mt-2 bg-white rounded-lg shadow-lg border z-10">
+                    <button onclick="switchLanguage('en')" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left">English</button>
+                    <button onclick="switchLanguage('te')" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left">తెలుగు</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Add Field Form -->
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-xl font-semibold mb-4" data-translate="Add Field">Add Field</h2>
+            <form id="fieldForm" class="space-y-4">
+                <input type="text" name="name" placeholder="Field Name" required class="w-full p-2 border rounded">
+                <input type="number" name="moisture" placeholder="Moisture Level" required class="w-full p-2 border rounded">
+                <select name="status" required class="w-full p-2 border rounded">
+                    <option value="">Select Status</option>
+                    <option value="Optimal">Optimal</option>
+                    <option value="Monitor">Monitor</option>
+                    <option value="Dry">Dry</option>
+                    <option value="Wet">Wet</option>
+                </select>
+                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded" data-translate="Add Field">Add Field</button>
+            </form>
+        </div>
+
+        <!-- Add Alert Form -->
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-xl font-semibold mb-4">Add Alert</h2>
+            <form id="alertForm" class="space-y-4">
+                <input type="text" name="field" placeholder="Field Name" required class="w-full p-2 border rounded">
+                <input type="text" name="message" placeholder="Alert Message" required class="w-full p-2 border rounded">
+                <select name="status" required class="w-full p-2 border rounded">
+                    <option value="">Select Status</option>
+                    <option value="Critical">Critical</option>
+                    <option value="Warning">Warning</option>
+                    <option value="Info">Info</option>
+                </select>
+                <input type="text" name="time" placeholder="Time (e.g., 2 hours ago)" required class="w-full p-2 border rounded">
+                <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded">Add Alert</button>
+            </form>
+        </div>
+
+        <!-- Add Sensor Data Form -->
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-xl font-semibold mb-4">Add Sensor Data</h2>
+            <form id="sensorForm" class="space-y-4">
+                <input type="date" name="date" required class="w-full p-2 border rounded">
+                <input type="number" name="moisture" placeholder="Moisture %" required class="w-full p-2 border rounded">
+                <input type="number" name="temperature" placeholder="Temperature °C" required class="w-full p-2 border rounded">
+                <input type="number" name="rainfall" placeholder="Rainfall mm" required class="w-full p-2 border rounded">
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Add Sensor Data</button>
+            </form>
+        </div>
+
+        <a href="/dashboard" class="bg-gray-600 text-white px-4 py-2 rounded inline-block" data-translate="Back to Dashboard">Back to Dashboard</a>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/translations.js') }}"></script>
+    <script>
+        document.getElementById('fieldForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            data.moisture = parseInt(data.moisture);
+            
+            const response = await fetch('/api/add-field', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            
+            if (response.ok) {
+                alert('Field added successfully!');
+                e.target.reset();
+            }
+        });
+
+        document.getElementById('alertForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            data.time = 'Just now';
+            
+            try {
+                const response = await fetch('/api/add-alert', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    alert('Alert added successfully!');
+                    e.target.reset();
+                } else {
+                    alert('Error adding alert');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        });
+
+        document.getElementById('sensorForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            data.moisture = parseInt(data.moisture);
+            data.temperature = parseInt(data.temperature);
+            data.rainfall = parseInt(data.rainfall);
+            
+            try {
+                const response = await fetch('/api/add-sensor-data', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    alert('Sensor data added successfully!');
+                    e.target.reset();
+                } else {
+                    alert('Error adding sensor data');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>

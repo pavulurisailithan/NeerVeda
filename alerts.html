@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alerts - NeerVeda</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/professional.css') }}">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 50%, #7f1d1d 100%);
+        }
+        .alert-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        .alert-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+            border-left: 4px solid #ef4444;
+        }
+        .critical-alert {
+            border-left: 4px solid #dc2626;
+            background: rgba(220, 38, 38, 0.1);
+        }
+        .warning-alert {
+            border-left: 4px solid #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+        }
+        .info-alert {
+            border-left: 4px solid #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+        .pulse-dot {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .alert-nav {
+            background: rgba(220, 38, 38, 0.9);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen text-white">
+    <!-- Alert Navigation -->
+    <nav class="alert-nav sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                        <i data-feather="alert-triangle" class="text-white w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="font-bold text-xl text-white">NeerVeda</span>
+                        <div class="text-xs text-white/70 font-medium">Alert Management</div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-1">
+                    <a href="/" class="px-4 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition">Home</a>
+                    <a href="/dashboard" class="px-4 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition">Dashboard</a>
+                    <a href="/alerts" class="px-4 py-2 rounded-lg bg-white/20 text-white font-semibold">Alerts</a>
+                    <a href="/fields" class="px-4 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition">Fields</a>
+                    <a href="/crop-seasons" class="px-4 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition">Seasons</a>
+                    <a href="/irrigation" class="px-4 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition">Irrigation</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Alert Header -->
+    <div class="container mx-auto px-6 py-8">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-4xl font-bold mb-2" data-translate="Alert Management Center">🚨 Alert Management Center</h1>
+                <p class="text-white/80 text-lg" data-translate="Monitor critical conditions and system notifications">Monitor critical conditions and system notifications</p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2 bg-white/10 px-4 py-2 rounded-lg">
+                    <span class="pulse-dot w-3 h-3 bg-red-500 rounded-full"></span>
+                    <span class="text-sm" data-translate="Live Monitoring">Live Monitoring</span>
+                </div>
+                <button class="bg-white/20 text-white px-4 py-2 rounded-lg hover:bg-white/30 transition">
+                    <i data-feather="settings" class="w-4 h-4 inline mr-2"></i><span data-translate="Settings">Settings</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Alert Statistics -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="alert-card critical-alert rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-red-500/30 rounded-xl flex items-center justify-center">
+                        <i data-feather="alert-octagon" class="text-red-400 w-6 h-6"></i>
+                    </div>
+                    <span class="text-xs bg-red-500/20 text-red-300 px-2 py-1 rounded-full">Critical</span>
+                </div>
+                <div class="text-white/60 text-sm mb-1" data-translate="Critical Alerts">Critical Alerts</div>
+                <div class="text-3xl font-bold mb-2">3</div>
+                <div class="text-xs text-red-400">Immediate attention required</div>
+            </div>
+            
+            <div class="alert-card warning-alert rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-yellow-500/30 rounded-xl flex items-center justify-center">
+                        <i data-feather="alert-triangle" class="text-yellow-400 w-6 h-6"></i>
+                    </div>
+                    <span class="text-xs bg-yellow-500/20 text-yellow-300 px-2 py-1 rounded-full">Warning</span>
+                </div>
+                <div class="text-white/60 text-sm mb-1" data-translate="Warning Alerts">Warning Alerts</div>
+                <div class="text-3xl font-bold mb-2">7</div>
+                <div class="text-xs text-yellow-400">Monitor closely</div>
+            </div>
+            
+            <div class="alert-card info-alert rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-blue-500/30 rounded-xl flex items-center justify-center">
+                        <i data-feather="info" class="text-blue-400 w-6 h-6"></i>
+                    </div>
+                    <span class="text-xs bg-blue-500/20 text-blue-300 px-2 py-1 rounded-full">Info</span>
+                </div>
+                <div class="text-white/60 text-sm mb-1" data-translate="Info Alerts">Info Alerts</div>
+                <div class="text-3xl font-bold mb-2">12</div>
+                <div class="text-xs text-blue-400">General notifications</div>
+            </div>
+            
+            <div class="alert-card rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-green-500/30 rounded-xl flex items-center justify-center">
+                        <i data-feather="check-circle" class="text-green-400 w-6 h-6"></i>
+                    </div>
+                    <span class="text-xs bg-green-500/20 text-green-300 px-2 py-1 rounded-full">Resolved</span>
+                </div>
+                <div class="text-white/60 text-sm mb-1" data-translate="Resolved Today">Resolved Today</div>
+                <div class="text-3xl font-bold mb-2">15</div>
+                <div class="text-xs text-green-400">Issues fixed</div>
+            </div>
+        </div>
+
+        <!-- Alert Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <div class="alert-card rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-xl font-bold">Alert Trends</h3>
+                        <p class="text-white/60 text-sm">Last 7 days activity</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="w-3 h-3 bg-red-500 rounded-full"></span>
+                        <span class="text-sm text-white/70">Live Data</span>
+                    </div>
+                </div>
+                <div class="bg-black/20 rounded-xl p-4">
+                    <canvas id="alertTrendChart" height="200"></canvas>
+                </div>
+            </div>
+            
+            <div class="alert-card rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-xl font-bold">Alert Distribution</h3>
+                        <p class="text-white/60 text-sm">By severity level</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="w-3 h-3 bg-yellow-500 rounded-full"></span>
+                        <span class="text-sm text-white/70">Current</span>
+                    </div>
+                </div>
+                <div class="bg-black/20 rounded-xl p-4">
+                    <canvas id="alertDistributionChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Alerts List -->
+        <div class="alert-card rounded-2xl overflow-hidden">
+            <div class="p-6 border-b border-white/10">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-2xl font-bold">🔥 Active Alerts</h3>
+                        <p class="text-white/60">Critical notifications requiring immediate attention</p>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button class="bg-white/10 text-white px-4 py-2 rounded-lg hover:bg-white/20 transition">
+                            <i data-feather="filter" class="w-4 h-4 inline mr-2"></i>Filter
+                        </button>
+                        <button class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">
+                            <i data-feather="plus" class="w-4 h-4 inline mr-2"></i>New Alert
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="alertContainer" class="divide-y divide-white/10">
+                <!-- Alerts will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Alert Settings -->
+        <div class="alert-card rounded-2xl p-8 mt-8">
+            <h3 class="text-2xl font-bold mb-6">⚙️ Alert Preferences</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="space-y-4">
+                    <h4 class="font-semibold text-lg">Notification Channels</h4>
+                    <div class="space-y-3">
+                        <label class="flex items-center justify-between">
+                            <span>Email Notifications</span>
+                            <input type="checkbox" checked class="toggle-switch">
+                        </label>
+                        <label class="flex items-center justify-between">
+                            <span>SMS Alerts</span>
+                            <input type="checkbox" class="toggle-switch">
+                        </label>
+                        <label class="flex items-center justify-between">
+                            <span>Push Notifications</span>
+                            <input type="checkbox" checked class="toggle-switch">
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <h4 class="font-semibold text-lg">Alert Thresholds</h4>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm mb-1">Moisture Critical (%)</label>
+                            <input type="range" min="0" max="100" value="30" class="w-full">
+                            <span class="text-xs text-white/60">30%</span>
+                        </div>
+                        <div>
+                            <label class="block text-sm mb-1">Temperature Alert (°C)</label>
+                            <input type="range" min="0" max="50" value="35" class="w-full">
+                            <span class="text-xs text-white/60">35°C</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <h4 class="font-semibold text-lg">Auto Actions</h4>
+                    <div class="space-y-3">
+                        <label class="flex items-center justify-between">
+                            <span>Auto Irrigation</span>
+                            <input type="checkbox" class="toggle-switch">
+                        </label>
+                        <label class="flex items-center justify-between">
+                            <span>Emergency Alerts</span>
+                            <input type="checkbox" checked class="toggle-switch">
+                        </label>
+                        <label class="flex items-center justify-between">
+                            <span>Daily Reports</span>
+                            <input type="checkbox" checked class="toggle-switch">
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <button class="mt-6 bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition">
+                Save Preferences
+            </button>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/translations.js') }}"></script>
+    <script>
+        feather.replace();
+
+        // Sample alert data
+        const alertData = [
+            { type: 'critical', field: 'East Field', message: 'Soil moisture critically low (25%)', time: '2 min ago', icon: 'alert-octagon' },
+            { type: 'critical', field: 'North Field', message: 'Sensor offline for 3 hours', time: '15 min ago', icon: 'wifi-off' },
+            { type: 'warning', field: 'South Field', message: 'Temperature above optimal (38°C)', time: '1 hour ago', icon: 'thermometer' },
+            { type: 'warning', field: 'West Field', message: 'Moderate moisture level (45%)', time: '2 hours ago', icon: 'droplet' },
+            { type: 'info', field: 'All Fields', message: 'Weather forecast: Rain expected', time: '3 hours ago', icon: 'cloud-rain' }
+        ];
+
+        function renderAlerts() {
+            const container = document.getElementById('alertContainer');
+            container.innerHTML = alertData.map(alert => `
+                <div class="flex items-center justify-between p-6 hover:bg-white/5 transition">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 ${getAlertBg(alert.type)} rounded-xl flex items-center justify-center">
+                            <i data-feather="${alert.icon}" class="${getAlertColor(alert.type)} w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-lg">${alert.message}</div>
+                            <div class="text-white/60 text-sm">${alert.field} • ${alert.time}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="${getAlertBadge(alert.type)} px-3 py-1 rounded-full text-xs font-medium">${alert.type.toUpperCase()}</span>
+                        <button class="text-white/60 hover:text-white">
+                            <i data-feather="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            feather.replace();
+        }
+
+        function getAlertBg(type) {
+            switch(type) {
+                case 'critical': return 'bg-red-500/30';
+                case 'warning': return 'bg-yellow-500/30';
+                case 'info': return 'bg-blue-500/30';
+                default: return 'bg-gray-500/30';
+            }
+        }
+
+        function getAlertColor(type) {
+            switch(type) {
+                case 'critical': return 'text-red-400';
+                case 'warning': return 'text-yellow-400';
+                case 'info': return 'text-blue-400';
+                default: return 'text-gray-400';
+            }
+        }
+
+        function getAlertBadge(type) {
+            switch(type) {
+                case 'critical': return 'bg-red-500/20 text-red-300';
+                case 'warning': return 'bg-yellow-500/20 text-yellow-300';
+                case 'info': return 'bg-blue-500/20 text-blue-300';
+                default: return 'bg-gray-500/20 text-gray-300';
+            }
+        }
+
+        // Initialize charts
+        function initCharts() {
+            const trendCtx = document.getElementById('alertTrendChart').getContext('2d');
+            new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Critical',
+                        data: [2, 4, 3, 5, 2, 3, 4],
+                        borderColor: '#dc2626',
+                        backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Warning',
+                        data: [5, 7, 6, 8, 5, 7, 6],
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { labels: { color: 'white' } } },
+                    scales: {
+                        y: { 
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: 'rgba(255,255,255,0.7)' }
+                        },
+                        x: {
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: 'rgba(255,255,255,0.7)' }
+                        }
+                    }
+                }
+            });
+
+            const distCtx = document.getElementById('alertDistributionChart').getContext('2d');
+            new Chart(distCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Critical', 'Warning', 'Info'],
+                    datasets: [{
+                        data: [3, 7, 12],
+                        backgroundColor: ['#dc2626', '#f59e0b', '#3b82f6'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { labels: { color: 'white' } } }
+                }
+            });
+        }
+
+        // Alert management functions
+        function dismissAlert(index) {
+            alertData.splice(index, 1);
+            renderAlerts();
+            alert('Alert dismissed');
+        }
+        
+        function createNewAlert() {
+            const field = prompt('Enter field name:');
+            const message = prompt('Enter alert message:');
+            const type = prompt('Enter alert type (critical/warning/info):');
+            
+            if (field && message && type) {
+                alertData.unshift({
+                    type: type.toLowerCase(),
+                    field: field,
+                    message: message,
+                    time: 'Just now',
+                    icon: type === 'critical' ? 'alert-octagon' : type === 'warning' ? 'alert-triangle' : 'info'
+                });
+                renderAlerts();
+                alert('New alert created!');
+            }
+        }
+        
+        function filterAlerts() {
+            const filterType = prompt('Filter by type (critical/warning/info/all):');
+            if (filterType && filterType !== 'all') {
+                const filtered = alertData.filter(alert => alert.type === filterType.toLowerCase());
+                displayFilteredAlerts(filtered);
+            } else {
+                renderAlerts();
+            }
+        }
+        
+        function displayFilteredAlerts(filtered) {
+            const container = document.getElementById('alertContainer');
+            container.innerHTML = filtered.map((alert, index) => `
+                <div class="flex items-center justify-between p-6 hover:bg-white/5 transition">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 ${getAlertBg(alert.type)} rounded-xl flex items-center justify-center">
+                            <i data-feather="${alert.icon}" class="${getAlertColor(alert.type)} w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-lg">${alert.message}</div>
+                            <div class="text-white/60 text-sm">${alert.field} • ${alert.time}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="${getAlertBadge(alert.type)} px-3 py-1 rounded-full text-xs font-medium">${alert.type.toUpperCase()}</span>
+                        <button onclick="dismissAlert(${index})" class="text-white/60 hover:text-white">
+                            <i data-feather="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            feather.replace();
+        }
+        
+        function saveAlertSettings() {
+            const settings = {
+                email: document.querySelector('input[type="checkbox"]:nth-of-type(1)').checked,
+                sms: document.querySelector('input[type="checkbox"]:nth-of-type(2)').checked,
+                push: document.querySelector('input[type="checkbox"]:nth-of-type(3)').checked,
+                autoIrrigation: document.querySelector('input[type="checkbox"]:nth-of-type(4)').checked,
+                emergency: document.querySelector('input[type="checkbox"]:nth-of-type(5)').checked,
+                dailyReports: document.querySelector('input[type="checkbox"]:nth-of-type(6)').checked
+            };
+            
+            localStorage.setItem('alertSettings', JSON.stringify(settings));
+            alert('Alert preferences saved successfully!');
+        }
+        
+        function loadAlertSettings() {
+            const saved = localStorage.getItem('alertSettings');
+            if (saved) {
+                const settings = JSON.parse(saved);
+                const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                checkboxes[0].checked = settings.email;
+                checkboxes[1].checked = settings.sms;
+                checkboxes[2].checked = settings.push;
+                checkboxes[3].checked = settings.autoIrrigation;
+                checkboxes[4].checked = settings.emergency;
+                checkboxes[5].checked = settings.dailyReports;
+            }
+        }
+        
+        function openAlertSettings() {
+            alert('Alert settings panel opened - Configure your preferences below');
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            renderAlerts();
+            initCharts();
+            loadAlertSettings();
+            
+            // Make buttons functional
+            document.querySelectorAll('button').forEach(button => {
+                if (button.textContent.includes('New Alert')) {
+                    button.onclick = createNewAlert;
+                } else if (button.textContent.includes('Filter')) {
+                    button.onclick = filterAlerts;
+                } else if (button.textContent.includes('Settings')) {
+                    button.onclick = openAlertSettings;
+                } else if (button.textContent.includes('Save Preferences')) {
+                    button.onclick = saveAlertSettings;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

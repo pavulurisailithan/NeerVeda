@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Field Management - NeerVeda</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/professional.css') }}">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        }
+        .field-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        .field-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 1);
+        }
+        .map-container {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .moisture-gauge {
+            background: linear-gradient(90deg, #ef4444, #f59e0b, #22c55e);
+            border-radius: 8px;
+            height: 8px;
+            position: relative;
+        }
+        .moisture-level {
+            height: 100%;
+            background: rgba(255,255,255,0.4);
+            border-radius: 8px;
+            transition: width 1s ease;
+        }
+        .glass-nav {
+            backdrop-filter: blur(15px);
+            background: rgba(30, 60, 114, 0.9);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Field Management Navigation -->
+    <nav class="glass-nav sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                        <i data-feather="map" class="text-white w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="font-bold text-xl text-white">NeerVeda</span>
+                        <div class="text-xs text-white/70 font-medium">Field Management</div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-1">
+                    <a href="/" class="px-4 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition">Home</a>
+                    <a href="/dashboard" class="px-4 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition">Dashboard</a>
+                    <a href="/alerts" class="px-4 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition">Alerts</a>
+                    <a href="/fields" class="px-4 py-2 rounded-lg bg-white/20 text-white font-semibold">Fields</a>
+                    <a href="/crop-seasons" class="px-4 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition">Seasons</a>
+                    <a href="/irrigation" class="px-4 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition">Irrigation</a>
+                    <div class="relative ml-4">
+                        <button id="langBtn" class="flex items-center space-x-1 bg-white/20 text-white px-3 py-1 rounded-lg hover:bg-white/30 transition">
+                            <span id="langText">EN</span>
+                            <i data-feather="chevron-down" class="w-4 h-4"></i>
+                        </button>
+                        <div id="langDropdown" class="hidden absolute right-0 mt-2 bg-white rounded-lg shadow-lg border z-10">
+                            <button onclick="switchLanguage('en')" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left">English</button>
+                            <button onclick="switchLanguage('te')" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left">తెలుగు</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <div class="container mx-auto px-6 py-8">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-4xl font-bold text-white mb-2" data-translate="Field Management">🗺️ Field Management</h1>
+                <p class="text-white/80 text-lg" data-translate="Monitor and manage your agricultural fields with precision mapping">Monitor and manage your agricultural fields with precision mapping</p>
+            </div>
+            <div class="flex space-x-3">
+                <button onclick="loadFields()" class="bg-white/20 text-white px-4 py-2 rounded-lg hover:bg-white/30 transition backdrop-blur-sm">
+                    <i data-feather="refresh-cw" class="w-4 h-4 inline mr-2"></i><span data-translate="Refresh">Refresh</span>
+                </button>
+                <a href="/add-field" class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition">
+                    <i data-feather="plus" class="w-4 h-4 inline mr-2"></i><span data-translate="Add Field">Add Field</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Map Overview -->
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-white/20">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-white" data-translate="All Fields Overview">📍 All Fields Overview</h2>
+                <div class="flex items-center space-x-4 text-white/80 text-sm">
+                    <div class="flex items-center">
+                        <span class="status-indicator bg-green-500"></span>Optimal
+                    </div>
+                    <div class="flex items-center">
+                        <span class="status-indicator bg-yellow-500"></span>Monitor
+                    </div>
+                    <div class="flex items-center">
+                        <span class="status-indicator bg-red-500"></span>Critical
+                    </div>
+                </div>
+            </div>
+            <div class="map-container">
+                <div id="map" class="h-96 w-full"></div>
+            </div>
+        </div>
+
+        <!-- Field Cards Grid -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-white mb-6" data-translate="Individual Fields">🌾 Individual Fields</h2>
+            <div id="fieldCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Field cards will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Sensor Network Status -->
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+            <h2 class="text-2xl font-bold text-white mb-6" data-translate="Sensor Network Status">📡 Sensor Network Status</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="sensor-status bg-white/10 p-4 rounded-xl backdrop-blur-sm">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="w-10 h-10 bg-green-500/30 rounded-lg flex items-center justify-center">
+                            <i data-feather="wifi" class="text-green-300 w-5 h-5"></i>
+                        </div>
+                        <span class="bg-green-500/20 text-green-300 px-2 py-1 rounded-full text-xs">Online</span>
+                    </div>
+                    <h4 class="font-semibold text-white mb-1">North Field Sensor</h4>
+                    <p class="text-white/60 text-sm">Last update: 12 min ago</p>
+                </div>
+                <div class="sensor-status bg-white/10 p-4 rounded-xl backdrop-blur-sm">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="w-10 h-10 bg-green-500/30 rounded-lg flex items-center justify-center">
+                            <i data-feather="wifi" class="text-green-300 w-5 h-5"></i>
+                        </div>
+                        <span class="bg-green-500/20 text-green-300 px-2 py-1 rounded-full text-xs">Online</span>
+                    </div>
+                    <h4 class="font-semibold text-white mb-1">South Field Sensor</h4>
+                    <p class="text-white/60 text-sm">Last update: 8 min ago</p>
+                </div>
+                <div class="sensor-status bg-white/10 p-4 rounded-xl backdrop-blur-sm">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="w-10 h-10 bg-red-500/30 rounded-lg flex items-center justify-center">
+                            <i data-feather="wifi-off" class="text-red-300 w-5 h-5"></i>
+                        </div>
+                        <span class="bg-red-500/20 text-red-300 px-2 py-1 rounded-full text-xs">Offline</span>
+                    </div>
+                    <h4 class="font-semibold text-white mb-1">East Field Sensor</h4>
+                    <p class="text-white/60 text-sm">Last update: 3 hrs ago</p>
+                </div>
+                <div class="sensor-status bg-white/10 p-4 rounded-xl backdrop-blur-sm">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="w-10 h-10 bg-green-500/30 rounded-lg flex items-center justify-center">
+                            <i data-feather="wifi" class="text-green-300 w-5 h-5"></i>
+                        </div>
+                        <span class="bg-green-500/20 text-green-300 px-2 py-1 rounded-full text-xs">Online</span>
+                    </div>
+                    <h4 class="font-semibold text-white mb-1">West Field Sensor</h4>
+                    <p class="text-white/60 text-sm">Last update: 15 min ago</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/translations.js') }}"></script>
+    <script>
+        feather.replace();
+        let allFields = [];
+
+        async function loadFields() {
+            try {
+                const response = await fetch('/api/fields');
+                const apiFields = await response.json();
+                
+                allFields = apiFields.map(field => ({
+                    ...field,
+                    lat: field.lat || field.latitude,
+                    lng: field.lng || field.longitude
+                }));
+                
+                displayFields(allFields);
+                setTimeout(initializeMaps, 500);
+            } catch (error) {
+                console.error('Error loading fields:', error);
+                allFields = [
+                    { name: 'North Field', lat: 16.4333, lng: 80.8500, crop: 'Wheat', area: 5.2, moisture: 58, status: 'Monitor' },
+                    { name: 'South Field', lat: 16.4300, lng: 80.8550, crop: 'Corn', area: 8.7, moisture: 72, status: 'Optimal' },
+                    { name: 'East Field', lat: 16.4380, lng: 80.8600, crop: 'Soybeans', area: 6.5, moisture: 45, status: 'Dry' }
+                ];
+                displayFields(allFields);
+                setTimeout(initializeMaps, 500);
+            }
+        }
+        
+        function displayFields(fields) {
+            const container = document.getElementById('fieldCards');
+            container.innerHTML = fields.map(field => `
+                <div class="field-card rounded-2xl overflow-hidden">
+                    <div class="relative">
+                        <div id="map-${field.name.toLowerCase().replace(/\s+/g, '-')}" class="h-48"></div>
+                        <span class="absolute top-3 left-3 ${getStatusBadge(field.status)} text-white text-xs px-3 py-1 rounded-full font-medium">${field.status}</span>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-bold text-xl mb-2 text-gray-800">${field.name}</h3>
+                        <p class="text-gray-600 text-sm mb-4">${field.crop || 'Unknown'} • ${field.area || 0} hectares</p>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-sm text-gray-600">Moisture Level</span>
+                            <span class="font-bold text-lg ${getMoistureColor(field.moisture)}">${field.moisture}%</span>
+                        </div>
+                        <div class="moisture-gauge mb-4">
+                            <div class="moisture-level" style="width: ${field.moisture}%"></div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center ${getStatusColor(field.status)}">
+                                <i data-feather="${getStatusIcon(field.status)}" class="w-4 h-4 mr-2"></i>
+                                <span class="font-medium">${field.status}</span>
+                            </div>
+                            <button class="text-blue-600 hover:text-blue-800 font-medium text-sm">
+                                View Details →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            feather.replace();
+        }
+        
+        function getStatusBadge(status) {
+            switch(status) {
+                case 'Critical': case 'Dry': return 'bg-red-500';
+                case 'Warning': case 'Monitor': return 'bg-yellow-500';
+                case 'Wet': return 'bg-blue-500';
+                default: return 'bg-green-500';
+            }
+        }
+        
+        function getStatusColor(status) {
+            switch(status) {
+                case 'Critical': case 'Dry': return 'text-red-600';
+                case 'Warning': case 'Monitor': return 'text-yellow-600';
+                case 'Wet': return 'text-blue-600';
+                default: return 'text-green-600';
+            }
+        }
+        
+        function getMoistureColor(moisture) {
+            if (moisture < 30) return 'text-red-600';
+            if (moisture < 50) return 'text-yellow-600';
+            if (moisture > 80) return 'text-blue-600';
+            return 'text-green-600';
+        }
+        
+        function getStatusIcon(status) {
+            switch(status) {
+                case 'Critical': case 'Dry': return 'alert-octagon';
+                case 'Warning': case 'Monitor': return 'alert-triangle';
+                case 'Wet': return 'cloud';
+                default: return 'check-circle';
+            }
+        }
+
+        function initializeMaps() {
+            // Main map
+            try {
+                if (window.mainMap) window.mainMap.remove();
+                
+                window.mainMap = L.map('map').setView([16.4333, 80.8500], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(window.mainMap);
+                
+                allFields.forEach(field => {
+                    if (field.lat && field.lng) {
+                        const color = field.status === 'Optimal' ? 'green' : 
+                                     field.status === 'Monitor' ? 'orange' : 'red';
+                        
+                        const marker = L.circleMarker([field.lat, field.lng], {
+                            color: color,
+                            fillColor: color,
+                            fillOpacity: 0.7,
+                            radius: 8
+                        }).addTo(window.mainMap);
+                        
+                        marker.bindPopup(`
+                            <b>${field.name}</b><br>
+                            Crop: ${field.crop}<br>
+                            Area: ${field.area} hectares<br>
+                            Moisture: ${field.moisture}%<br>
+                            Status: ${field.status}
+                        `);
+                    }
+                });
+            } catch (error) {
+                console.error('Error initializing main map:', error);
+            }
+            
+            // Individual field maps
+            setTimeout(() => {
+                allFields.forEach(field => {
+                    const mapId = `map-${field.name.toLowerCase().replace(/\s+/g, '-')}`;
+                    const mapElement = document.getElementById(mapId);
+                    
+                    if (mapElement && field.lat && field.lng) {
+                        try {
+                            if (window[mapId]) window[mapId].remove();
+                            
+                            window[mapId] = L.map(mapId).setView([field.lat, field.lng], 17);
+                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(window[mapId]);
+                            
+                            L.marker([field.lat, field.lng]).addTo(window[mapId]);
+                            
+                            const fieldBounds = [
+                                [field.lat - 0.002, field.lng - 0.003],
+                                [field.lat - 0.002, field.lng + 0.003],
+                                [field.lat + 0.002, field.lng + 0.003],
+                                [field.lat + 0.002, field.lng - 0.003]
+                            ];
+                            L.polygon(fieldBounds, {color: '#10B981', fillOpacity: 0.2}).addTo(window[mapId]);
+                        } catch (error) {
+                            console.error(`Error initializing map for ${field.name}:`, error);
+                        }
+                    }
+                });
+            }, 1000);
+        }
+        
+        // Field management functions
+        function refreshFields() {
+            loadFields();
+            alert('Field data refreshed!');
+        }
+        
+        function viewFieldDetails(fieldName) {
+            alert(`Opening detailed view for ${fieldName}`);
+            // Simulate opening field details modal or page
+            const field = allFields.find(f => f.name === fieldName);
+            if (field) {
+                const details = `
+                    Field: ${field.name}
+                    Crop: ${field.crop}
+                    Area: ${field.area} hectares
+                    Moisture: ${field.moisture}%
+                    Status: ${field.status}
+                    Location: ${field.lat}, ${field.lng}
+                `;
+                alert(details);
+            }
+        }
+        
+        function toggleSensorStatus(sensorName) {
+            const sensor = document.querySelector(`h4:contains("${sensorName}")`)?.closest('.sensor-status');
+            if (sensor) {
+                const statusSpan = sensor.querySelector('span');
+                const icon = sensor.querySelector('i');
+                const isOnline = statusSpan.textContent === 'Online';
+                
+                if (isOnline) {
+                    statusSpan.textContent = 'Offline';
+                    statusSpan.className = 'bg-red-500/20 text-red-300 px-2 py-1 rounded-full text-xs';
+                    icon.setAttribute('data-feather', 'wifi-off');
+                    icon.className = 'text-red-300 w-5 h-5';
+                    sensor.querySelector('p').textContent = 'Last update: 3 hrs ago';
+                } else {
+                    statusSpan.textContent = 'Online';
+                    statusSpan.className = 'bg-green-500/20 text-green-300 px-2 py-1 rounded-full text-xs';
+                    icon.setAttribute('data-feather', 'wifi');
+                    icon.className = 'text-green-300 w-5 h-5';
+                    sensor.querySelector('p').textContent = 'Last update: 2 min ago';
+                }
+                feather.replace();
+                alert(`${sensorName} sensor ${isOnline ? 'disconnected' : 'reconnected'}`);
+            }
+        }
+        
+        function exportFieldData() {
+            const csvContent = "Field,Crop,Area,Moisture,Status,Latitude,Longitude\n" +
+                allFields.map(field => 
+                    `${field.name},${field.crop},${field.area},${field.moisture}%,${field.status},${field.lat},${field.lng}`
+                ).join('\n');
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'field_data.csv';
+            a.click();
+            alert('Field data exported to CSV!');
+        }
+        
+        function filterFields() {
+            const status = prompt('Filter by status (Optimal/Monitor/Dry/Critical/All):');
+            if (status && status !== 'All') {
+                const filtered = allFields.filter(field => 
+                    field.status.toLowerCase() === status.toLowerCase()
+                );
+                displayFields(filtered);
+                alert(`Showing ${filtered.length} fields with status: ${status}`);
+            } else {
+                displayFields(allFields);
+            }
+        }
+        
+        function startFieldIrrigation(fieldName) {
+            alert(`Starting irrigation for ${fieldName}...`);
+            // Update field status
+            const field = allFields.find(f => f.name === fieldName);
+            if (field && field.moisture < 70) {
+                field.moisture = Math.min(80, field.moisture + 15);
+                field.status = field.moisture > 60 ? 'Optimal' : 'Monitor';
+                displayFields(allFields);
+                setTimeout(initializeMaps, 500);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFields();
+            
+            // Auto-refresh every 30 seconds
+            setInterval(loadFields, 30000);
+            
+            // Make buttons functional
+            setTimeout(() => {
+                document.querySelectorAll('button').forEach(button => {
+                    if (button.textContent.includes('Refresh')) {
+                        button.onclick = refreshFields;
+                    } else if (button.textContent.includes('Add Field')) {
+                        button.onclick = () => window.location.href = '/add-field';
+                    } else if (button.textContent.includes('View Details')) {
+                        const card = button.closest('.field-card');
+                        const fieldName = card?.querySelector('h3')?.textContent;
+                        button.onclick = () => viewFieldDetails(fieldName);
+                    } else if (button.textContent.includes('Export')) {
+                        button.onclick = exportFieldData;
+                    } else if (button.textContent.includes('Filter')) {
+                        button.onclick = filterFields;
+                    }
+                });
+                
+                // Sensor status click handlers
+                document.querySelectorAll('.sensor-status').forEach(sensor => {
+                    const sensorName = sensor.querySelector('h4')?.textContent;
+                    sensor.style.cursor = 'pointer';
+                    sensor.onclick = () => toggleSensorStatus(sensorName);
+                });
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

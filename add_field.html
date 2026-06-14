@@ -1,0 +1,473 @@
+{% extends "base.html" %}
+
+{% block title %}Add New Field - NeerVeda{% endblock %}
+
+{% block content %}
+
+    <!-- Main Content -->
+    <div class="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 py-8">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto">
+                <!-- Header Section -->
+                <div class="text-center mb-8">
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+                        <i data-feather="plus-circle" class="w-8 h-8 text-green-600"></i>
+                    </div>
+                    <h1 class="text-4xl font-bold text-gray-800 mb-2" data-translate="Add New Field">Add New Field</h1>
+                    <p class="text-gray-600" data-translate="Create a new agricultural field with GPS location and monitoring setup">Create a new agricultural field with GPS location and monitoring setup</p>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                    <!-- Progress Bar -->
+                    <div class="bg-gradient-to-r from-green-500 to-blue-500 h-1"></div>
+                    
+                    <div class="p-8">
+                    <form id="addFieldForm" class="space-y-8">
+                        <!-- Basic Information Section -->
+                        <div class="space-y-6">
+                            <div class="flex items-center space-x-3 mb-4">
+                                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                    <i data-feather="info" class="w-4 h-4 text-green-600"></i>
+                                </div>
+                                <h2 class="text-xl font-semibold text-gray-800" data-translate="Basic Information">Basic Information</h2>
+                            </div>
+                            
+                            <div class="relative">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2" data-translate="Field Name">Field Name</label>
+                                <div class="relative">
+                                    <input type="text" name="name" required class="w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200" placeholder="Enter field name">
+                                    <i data-feather="map" class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="relative">
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2" data-translate="Crop Type">Crop Type</label>
+                                    <div class="relative">
+                                        <select name="crop" required class="w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 appearance-none bg-white">
+                                            <option value="">Select Crop</option>
+                                            <option value="Rice">🌾 Rice</option>
+                                            <option value="Wheat">🌾 Wheat</option>
+                                            <option value="Corn">🌽 Corn</option>
+                                            <option value="Cotton">🌿 Cotton</option>
+                                            <option value="Sugarcane">🎋 Sugarcane</option>
+                                            <option value="Soybean">🫘 Soybean</option>
+                                        </select>
+                                        <i data-feather="layers" class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                                        <i data-feather="chevron-down" class="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                                    </div>
+                                </div>
+                                
+                                <div class="relative">
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2" data-translate="Area (hectares)">Area (hectares)</label>
+                                    <div class="relative">
+                                        <input type="number" name="area" step="0.1" required class="w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200" placeholder="0.0">
+                                        <i data-feather="maximize" class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Monitoring Settings Section -->
+                        <div class="space-y-6">
+                            <div class="flex items-center space-x-3 mb-4">
+                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <i data-feather="activity" class="w-4 h-4 text-blue-600"></i>
+                                </div>
+                                <h2 class="text-xl font-semibold text-gray-800" data-translate="Monitoring Settings">Monitoring Settings</h2>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="relative">
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2" data-translate="Initial Moisture (%)">Initial Moisture (%)</label>
+                                    <div class="relative">
+                                        <input type="number" name="moisture" min="0" max="100" required class="w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" placeholder="50">
+                                        <i data-feather="droplet" class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                                    </div>
+                                </div>
+                                
+                                <div class="relative">
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2" data-translate="Status">Status</label>
+                                    <div class="relative">
+                                        <select name="status" required class="w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none bg-white">
+                                            <option value="Optimal">🟢 Optimal</option>
+                                            <option value="Monitor">🟡 Monitor</option>
+                                            <option value="Dry">🔴 Dry</option>
+                                            <option value="Wet">🔵 Wet</option>
+                                        </select>
+                                        <i data-feather="check-circle" class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                                        <i data-feather="chevron-down" class="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Location Section -->
+                        <div class="space-y-6">
+                            <div class="flex items-center space-x-3 mb-4">
+                                <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                                    <i data-feather="map-pin" class="w-4 h-4 text-purple-600"></i>
+                                </div>
+                                <h2 class="text-xl font-semibold text-gray-800" data-translate="GPS Location">GPS Location</h2>
+                            </div>
+                            
+                            <div class="bg-gray-50 rounded-xl p-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                                    <div class="relative">
+                                        <label class="block text-sm font-semibold text-gray-700 mb-2" data-translate="Latitude">Latitude</label>
+                                        <div class="relative">
+                                            <input type="number" name="latitude" step="0.000001" required class="w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 bg-white" placeholder="16.4333">
+                                            <i data-feather="navigation" class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="relative">
+                                        <label class="block text-sm font-semibold text-gray-700 mb-2" data-translate="Longitude">Longitude</label>
+                                        <div class="relative">
+                                            <input type="number" name="longitude" step="0.000001" required class="w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 bg-white" placeholder="80.8500">
+                                            <i data-feather="compass" class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-center">
+                                    <button type="button" onclick="getCurrentLocation()" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5" data-translate="Get Current Location">
+                                        <i data-feather="map-pin" class="w-5 h-5 mr-2"></i>
+                                        Get Current Location
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="border-t border-gray-200 pt-8">
+                            <div class="flex flex-wrap gap-4 justify-center">
+                                <button type="submit" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 text-white font-bold rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5" data-translate="Add Field">
+                                    <i data-feather="plus-circle" class="w-5 h-5 mr-2"></i>
+                                    Add Field
+                                </button>
+                                <a href="/fields" class="inline-flex items-center px-8 py-4 bg-gray-600 text-white font-semibold rounded-xl hover:bg-gray-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5" data-translate="Cancel">
+                                    <i data-feather="x" class="w-5 h-5 mr-2"></i>
+                                    Cancel
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+    <script>
+        feather.replace();
+
+        document.getElementById('addFieldForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const latitude = parseFloat(formData.get('latitude'));
+            const longitude = parseFloat(formData.get('longitude'));
+            
+            const fieldData = {
+                name: formData.get('name'),
+                crop: formData.get('crop'),
+                area: parseFloat(formData.get('area')),
+                moisture: parseInt(formData.get('moisture')),
+                status: formData.get('status'),
+                latitude: latitude,
+                longitude: longitude,
+                lat: latitude,  // Add both formats for compatibility
+                lng: longitude
+            };
+            
+            console.log('Submitting field data:', fieldData);
+            
+            try {
+                const response = await fetch('/api/add-field', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(fieldData)
+                });
+                
+                if (response.ok) {
+                    alert('Field added successfully!');
+                    // Trigger storage event for other tabs
+                    localStorage.setItem('fieldAdded', Date.now());
+                    // Redirect with refresh parameter
+                    window.location.href = '/fields?refresh=true';
+                } else {
+                    const errorData = await response.json();
+                    alert('Error adding field: ' + (errorData.message || 'Please try again.'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error adding field. Please try again.');
+            }
+        });
+        
+        function getCurrentLocation() {
+            const button = document.querySelector('button[onclick="getCurrentLocation()"]');
+            button.innerHTML = '<i data-feather="loader" class="w-5 h-5 mr-2 animate-spin"></i>Getting Location...';
+            button.disabled = true;
+            button.className = 'inline-flex items-center px-6 py-3 bg-gray-400 text-white font-semibold rounded-xl cursor-not-allowed';
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        document.querySelector('input[name="latitude"]').value = position.coords.latitude.toFixed(6);
+                        document.querySelector('input[name="longitude"]').value = position.coords.longitude.toFixed(6);
+                        button.innerHTML = '<i data-feather="check" class="w-5 h-5 mr-2"></i>Location Captured!';
+                        button.className = 'inline-flex items-center px-6 py-3 bg-green-600 text-white font-semibold rounded-xl';
+                        feather.replace();
+                        
+                        // Show success notification
+                        showNotification('Location captured successfully!', 'success');
+                        
+                        // Re-enable after 3 seconds
+                        setTimeout(() => {
+                            button.innerHTML = '<i data-feather="map-pin" class="w-5 h-5 mr-2"></i>Get Current Location';
+                            button.className = 'inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5';
+                            button.disabled = false;
+                            feather.replace();
+                        }, 3000);
+                    },
+                    function(error) {
+                        button.innerHTML = '<i data-feather="x" class="w-5 h-5 mr-2"></i>Location Failed';
+                        button.className = 'inline-flex items-center px-6 py-3 bg-red-600 text-white font-semibold rounded-xl';
+                        button.disabled = false;
+                        feather.replace();
+                        showNotification('Error getting location: ' + error.message, 'error');
+                        
+                        // Reset after 3 seconds
+                        setTimeout(() => {
+                            button.innerHTML = '<i data-feather="map-pin" class="w-5 h-5 mr-2"></i>Get Current Location';
+                            button.className = 'inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5';
+                            feather.replace();
+                        }, 3000);
+                    }
+                );
+            } else {
+                button.innerHTML = '<i data-feather="x" class="w-5 h-5 mr-2"></i>Not Supported';
+                button.className = 'inline-flex items-center px-6 py-3 bg-red-600 text-white font-semibold rounded-xl';
+                button.disabled = false;
+                feather.replace();
+                showNotification('Geolocation is not supported by this browser.', 'error');
+            }
+        }
+        
+        function validateForm() {
+            const name = document.querySelector('input[name="name"]').value;
+            const crop = document.querySelector('select[name="crop"]').value;
+            const area = document.querySelector('input[name="area"]').value;
+            const moisture = document.querySelector('input[name="moisture"]').value;
+            const lat = document.querySelector('input[name="latitude"]').value;
+            const lng = document.querySelector('input[name="longitude"]').value;
+            
+            if (!name || !crop || !area || !moisture || !lat || !lng) {
+                alert('Please fill in all required fields.');
+                return false;
+            }
+            
+            if (parseFloat(area) <= 0) {
+                alert('Area must be greater than 0.');
+                return false;
+            }
+            
+            if (parseInt(moisture) < 0 || parseInt(moisture) > 100) {
+                alert('Moisture must be between 0 and 100.');
+                return false;
+            }
+            
+            return true;
+        }
+        
+        function clearForm() {
+            if (confirm('Are you sure you want to clear all fields?')) {
+                document.getElementById('addFieldForm').reset();
+                alert('Form cleared!');
+            }
+        }
+        
+        function saveAsDraft() {
+            const formData = new FormData(document.getElementById('addFieldForm'));
+            const draft = {
+                name: formData.get('name'),
+                crop: formData.get('crop'),
+                area: formData.get('area'),
+                moisture: formData.get('moisture'),
+                status: formData.get('status'),
+                latitude: formData.get('latitude'),
+                longitude: formData.get('longitude'),
+                savedAt: new Date().toISOString()
+            };
+            
+            localStorage.setItem('fieldDraft', JSON.stringify(draft));
+            alert('Field data saved as draft!');
+        }
+        
+        function loadDraft() {
+            const draft = localStorage.getItem('fieldDraft');
+            if (draft) {
+                const data = JSON.parse(draft);
+                document.querySelector('input[name="name"]').value = data.name || '';
+                document.querySelector('select[name="crop"]').value = data.crop || '';
+                document.querySelector('input[name="area"]').value = data.area || '';
+                document.querySelector('input[name="moisture"]').value = data.moisture || '';
+                document.querySelector('select[name="status"]').value = data.status || '';
+                document.querySelector('input[name="latitude"]').value = data.latitude || '';
+                document.querySelector('input[name="longitude"]').value = data.longitude || '';
+                alert('Draft loaded successfully!');
+            } else {
+                alert('No draft found.');
+            }
+        }
+        
+        function previewField() {
+            if (!validateForm()) return;
+            
+            const formData = new FormData(document.getElementById('addFieldForm'));
+            const preview = `
+                Field Preview:
+                Name: ${formData.get('name')}
+                Crop: ${formData.get('crop')}
+                Area: ${formData.get('area')} hectares
+                Initial Moisture: ${formData.get('moisture')}%
+                Status: ${formData.get('status')}
+                Location: ${formData.get('latitude')}, ${formData.get('longitude')}
+            `;
+            alert(preview);
+        }
+        
+        // Enhanced form submission
+        document.getElementById('addFieldForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!validateForm()) return;
+            
+            const submitBtn = document.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i data-feather="loader" class="w-5 h-5 mr-2 animate-spin"></i>Adding Field...';
+            submitBtn.disabled = true;
+            submitBtn.className = 'inline-flex items-center px-8 py-4 bg-gray-400 text-white font-bold rounded-xl cursor-not-allowed';
+            
+            const formData = new FormData(e.target);
+            const latitude = parseFloat(formData.get('latitude'));
+            const longitude = parseFloat(formData.get('longitude'));
+            
+            const fieldData = {
+                name: formData.get('name'),
+                crop: formData.get('crop'),
+                area: parseFloat(formData.get('area')),
+                moisture: parseInt(formData.get('moisture')),
+                status: formData.get('status'),
+                latitude: latitude,
+                longitude: longitude,
+                lat: latitude,
+                lng: longitude
+            };
+            
+            try {
+                const response = await fetch('/api/add-field', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(fieldData)
+                });
+                
+                if (response.ok) {
+                    submitBtn.innerHTML = '<i data-feather="check" class="w-5 h-5 mr-2"></i>Field Added Successfully!';
+                    submitBtn.className = 'inline-flex items-center px-8 py-4 bg-green-600 text-white font-bold rounded-xl';
+                    feather.replace();
+                    
+                    // Show success notification
+                    showNotification('Field added successfully! Redirecting...', 'success');
+                    
+                    // Clear draft
+                    localStorage.removeItem('fieldDraft');
+                    
+                    // Trigger storage event for other tabs
+                    localStorage.setItem('fieldAdded', Date.now());
+                    
+                    setTimeout(() => {
+                        window.location.href = '/fields?refresh=true';
+                    }, 2000);
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to add field');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                submitBtn.innerHTML = '<i data-feather="x" class="w-5 h-5 mr-2"></i>Error - Try Again';
+                submitBtn.className = 'inline-flex items-center px-8 py-4 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-all duration-200';
+                submitBtn.disabled = false;
+                feather.replace();
+                showNotification('Error adding field: ' + error.message, 'error');
+                
+                // Reset button after 3 seconds
+                setTimeout(() => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.className = 'inline-flex items-center px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 text-white font-bold rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5';
+                    feather.replace();
+                }, 3000);
+            }
+        });
+        
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+            
+            notification.className = `fixed top-4 right-4 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // Slide in
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full');
+            }, 100);
+            
+            // Slide out and remove
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+        
+        // Add additional buttons
+        document.addEventListener('DOMContentLoaded', () => {
+            const buttonContainer = document.querySelector('.flex.flex-wrap.gap-4.justify-center');
+            
+            // Add preview button
+            const previewBtn = document.createElement('button');
+            previewBtn.type = 'button';
+            previewBtn.className = 'inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5';
+            previewBtn.innerHTML = '<i data-feather="eye" class="w-5 h-5 mr-2"></i>Preview';
+            previewBtn.onclick = previewField;
+            buttonContainer.insertBefore(previewBtn, buttonContainer.lastElementChild);
+            
+            // Add save draft button
+            const draftBtn = document.createElement('button');
+            draftBtn.type = 'button';
+            draftBtn.className = 'inline-flex items-center px-6 py-3 bg-yellow-600 text-white font-semibold rounded-xl hover:bg-yellow-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5';
+            draftBtn.innerHTML = '<i data-feather="save" class="w-5 h-5 mr-2"></i>Save Draft';
+            draftBtn.onclick = saveAsDraft;
+            buttonContainer.insertBefore(draftBtn, buttonContainer.lastElementChild);
+            
+            // Add load draft button
+            const loadBtn = document.createElement('button');
+            loadBtn.type = 'button';
+            loadBtn.className = 'inline-flex items-center px-6 py-3 bg-purple-600 text-white font-semibold rounded-xl hover:bg-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5';
+            loadBtn.innerHTML = '<i data-feather="upload" class="w-5 h-5 mr-2"></i>Load Draft';
+            loadBtn.onclick = loadDraft;
+            buttonContainer.insertBefore(loadBtn, buttonContainer.lastElementChild);
+            
+            feather.replace();
+        });
+    </script>
+{% endblock %}

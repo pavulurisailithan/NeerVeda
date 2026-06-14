@@ -1,0 +1,101 @@
+# Telugu translations for NeerVeda
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Language: te\n"
+
+msgid "Welcome to NeerVeda"
+msgstr "నీర్వేదకు స్వాగతం"
+
+msgid "Sign in to your account"
+msgstr "మీ ఖాతాలోకి సైన్ ఇన్ చేయండి"
+
+msgid "Email"
+msgstr "ఇమెయిల్"
+
+msgid "Password"
+msgstr "పాస్‌వర్డ్"
+
+msgid "Sign In"
+msgstr "సైన్ ఇన్"
+
+msgid "Don't have an account?"
+msgstr "ఖాతా లేదా?"
+
+msgid "Sign up"
+msgstr "సైన్ అప్"
+
+msgid "Create Account"
+msgstr "ఖాతా సృష్టించండి"
+
+msgid "Get started with NeerVeda"
+msgstr "నీర్వేదతో ప్రారంభించండి"
+
+msgid "Full Name"
+msgstr "పూర్తి పేరు"
+
+msgid "Create Account"
+msgstr "ఖాతా సృష్టించండి"
+
+msgid "Already have an account?"
+msgstr "ఇప్పటికే ఖాతా ఉందా?"
+
+msgid "Dashboard"
+msgstr "డాష్‌బోర్డ్"
+
+msgid "Fields"
+msgstr "పొలాలు"
+
+msgid "Alerts"
+msgstr "హెచ్చరికలు"
+
+msgid "Smart Agriculture Dashboard"
+msgstr "స్మార్ట్ వ్యవసాయ డాష్‌బోర్డ్"
+
+msgid "Field Monitoring"
+msgstr "పొలం పర్యవేక్షణ"
+
+msgid "Moisture Level"
+msgstr "తేమ స్థాయి"
+
+msgid "Temperature"
+msgstr "ఉష్ణోగ్రత"
+
+msgid "Rainfall"
+msgstr "వర్షపాతం"
+
+msgid "Status"
+msgstr "స్థితి"
+
+msgid "Optimal"
+msgstr "అనుకూలం"
+
+msgid "Monitor"
+msgstr "పర్యవేక్షణ"
+
+msgid "Dry"
+msgstr "పొడిగా"
+
+msgid "Wet"
+msgstr "తడిగా"
+
+msgid "Critical"
+msgstr "క్రిటికల్"
+
+msgid "Warning"
+msgstr "హెచ్చరిక"
+
+msgid "Low moisture detected"
+msgstr "తక్కువ తేమ గుర్తించబడింది"
+
+msgid "Moderate moisture level"
+msgstr "మధ్యస్థ తేమ స్థాయి"
+
+msgid "Language"
+msgstr "భాష"
+
+msgid "English"
+msgstr "ఇంగ్లీష్"
+
+msgid "Telugu"
+msgstr "తెలుగు"
